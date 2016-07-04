@@ -77,9 +77,11 @@ public class HdfsGateway implements Authorizable {
       hdfsClient
           .createDirectoryWithAcl(paths.getUserspacePath(orgId), orgAdmin, orgId, usrAllGroupExec,
               defaultWithTechUserAll);
+      hdfsClient
+          .createDirectoryWithAcl(paths.getSqoopImportsPath(orgId), orgAdmin, orgId, usrAllGroupAll,
+              defaultWithTechUserAll);
 
       hdfsClient.createDirectory(paths.getOozieJobsPath(orgId), orgAdmin, orgId, usrAllGroupAll);
-      hdfsClient.createDirectory(paths.getSqoopImportsPath(orgId), orgAdmin, orgId, usrAllGroupAll);
       hdfsClient.createDirectory(paths.getUsersPath(orgId), orgAdmin, orgId, usrAllGroupExec);
       hdfsClient.createDirectory(paths.getTmpPath(orgId), orgAdmin, orgId, usrAllGroupAll);
       hdfsClient.createDirectory(paths.getAppPath(orgId), orgAdmin, orgId, usrAllGroupExec);

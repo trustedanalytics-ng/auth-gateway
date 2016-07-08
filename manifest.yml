@@ -10,7 +10,9 @@ applications:
     KRB_REALM: placeholder
     KRB_USER: placeholder
     KRB_PASSWORD: placeholder
+    KRB_ENABLED: placeholder
     ZK_CLUSTER_URL: placeholder
+    ZK_PASSWORD: placeholder
     HADOOP_PROVIDED_ZIP: placeholder
     HBASE_PROVIDED_ZIP: placeholder
     HDFS_SUPERUSER: placeholder
@@ -29,5 +31,5 @@ applications:
     SENTRY_ADDRESS: placeholder
     SENTRY_PORT: placeholder
     SENTRY_PRINCIPAL: placeholder
-    VERSION: 0.7.7
+    VERSION: 0.8.3
     SPRING_PROFILES_ACTIVE: placeholder

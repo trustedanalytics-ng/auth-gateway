@@ -11,7 +11,7 @@ cloud:
     uaa: ${vcap.services.sso.credentials.uaaUri}
 zookeeper:
   clusterUrl: ${zk.cluster.url:}
-  user: ${hdfs.superuser:}
+  user: ${krb.user:}
   password: ${zk.password:authgateway}
   node: ${zk.node:/auth-gateway}
 kerberos:

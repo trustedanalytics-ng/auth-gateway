@@ -39,7 +39,7 @@ public class ZookeeperClientConfig {
     public ZookeeperClient getZookeeperClient() throws NoSuchAlgorithmException{
         ACL acl;
         if (zookeeperConfig.isKerberos())
-            acl = new ACL(ZooDefs.Perms.ALL, new Id("sasl", zookeeperConfig.getKerberosUser()));
+            acl = new ACL(ZooDefs.Perms.ALL, new Id("sasl", zookeeperConfig.getUsername()));
         else
             acl = new ACL(ZooDefs.Perms.ALL, new Id("digest",
                     DigestAuthenticationProvider.generateDigest(String.format("%s:%s",

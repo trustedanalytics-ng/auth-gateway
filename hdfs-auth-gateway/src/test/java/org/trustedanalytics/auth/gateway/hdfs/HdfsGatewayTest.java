@@ -107,6 +107,8 @@ public class HdfsGatewayTest {
 
   private List<AclEntry> defaultWithTechUserExec;
 
+  private List<AclEntry> defaultWithDefaultTechUserExec;
+
   private List<AclEntry> defaultWithTechUserAll;
 
   @Before
@@ -139,7 +141,9 @@ public class HdfsGatewayTest {
     when(status.getPermission()).thenReturn(new FsPermission(FsAction.NONE, FsAction.NONE, FsAction.NONE));
 
     defaultWithTechUserExec =
-        hdfsGateway.getDefaultAclWithKrbTechUserAction(FsAction.READ_EXECUTE, FsAction.EXECUTE, SYS_GROUP);
+        hdfsGateway.getDefaultAclWithKrbTechUserAction(FsAction.ALL, FsAction.EXECUTE, SYS_GROUP);
+    defaultWithDefaultTechUserExec =
+            hdfsGateway.getDefaultAclWithDefaultKrbTechUserAction(FsAction.ALL, FsAction.EXECUTE, SYS_GROUP);
     defaultWithTechUserAll =
         hdfsGateway.getDefaultAclWithKrbTechUserAction(FsAction.ALL, FsAction.ALL, SYS_GROUP);
   }
@@ -152,7 +156,7 @@ public class HdfsGatewayTest {
     verify(hdfsClient).createDirectoryWithAcl(ORG_PATH, "test_org_admin", "test_org",
         userAllGroupRead, defaultWithTechUserExec);
     verify(hdfsClient).createDirectoryWithAcl(BROKER_PATH, "test_org_admin", "test_org",
-        userAllGroupRead, defaultWithTechUserExec);
+            usrAllGroupAll, defaultWithDefaultTechUserExec);
     verify(hdfsClient).createDirectoryWithAcl(BROKER_USERSPACE_PATH, "test_org_admin", "test_org",
         userAllGroupRead, defaultWithTechUserAll);
     verify(hdfsClient).createDirectory(ORG_USERS_PATH, "test_org_admin", "test_org",

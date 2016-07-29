@@ -59,8 +59,10 @@ public class HdfsGateway implements Authorizable {
   public void addOrganization(String orgId) throws AuthorizableGatewayException {
     FsPermission usrAllGroupAll = HdfsPermission.USER_ALL_GROUP_ALL.getPermission();
     FsPermission usrAllGroupRead = HdfsPermission.USER_ALL_GROUP_READ.getPermission();
-    List<AclEntry> defaultWithKrbTechUserExec = getDefaultAclWithKrbTechUserAction(FsAction.READ_EXECUTE,
+    List<AclEntry> defaultWithKrbTechUserExec = getDefaultAclWithKrbTechUserAction(FsAction.ALL,
         FsAction.EXECUTE, orgId.concat(SYS_GROUP_POSTFIX));
+    List<AclEntry> defaultWithDefaultKrbTechUserExec = getDefaultAclWithDefaultKrbTechUserAction(FsAction.ALL,
+            FsAction.EXECUTE, orgId.concat(SYS_GROUP_POSTFIX));
     List<AclEntry> defaultWithTechUserAll = getDefaultAclWithKrbTechUserAction(FsAction.ALL,
         FsAction.ALL, orgId.concat(SYS_GROUP_POSTFIX));
     String orgAdmin = orgId.concat(ADMIN_POSTFIX);
@@ -72,11 +74,11 @@ public class HdfsGateway implements Authorizable {
           defaultWithKrbTechUserExec);
 
       hdfsClient
-          .createDirectoryWithAcl(paths.getBrokerPath(orgId), orgAdmin, orgId, usrAllGroupRead,
-              defaultWithKrbTechUserExec);
+          .createDirectoryWithAcl(paths.getBrokerPath(orgId), orgAdmin, orgId, usrAllGroupAll,
+              defaultWithDefaultKrbTechUserExec);
 
-      hdfsClient.updateDirectoryWithSubdirectories(paths.getBrokerPath(orgId), orgId, usrAllGroupRead);
-      hdfsClient.setACLForDirectoryWithSubdirectories(paths.getBrokerPath(orgId), defaultWithKrbTechUserExec);
+      hdfsClient.updateDirectoryWithSubdirectories(paths.getBrokerPath(orgId), orgId, usrAllGroupAll);
+      hdfsClient.setACLForDirectoryWithSubdirectories(paths.getBrokerPath(orgId), defaultWithDefaultKrbTechUserExec);
 
       hdfsClient
           .createDirectoryWithAcl(paths.getUserspacePath(orgId), orgAdmin, orgId, usrAllGroupRead,
@@ -87,7 +89,8 @@ public class HdfsGateway implements Authorizable {
               defaultWithTechUserAll);
 
       hdfsClient.updateDirectoryWithSubdirectories(paths.getSqoopImportsPath(orgId), orgId, usrAllGroupRead);
-      hdfsClient.setACLForDirectoryWithSubdirectories(paths.getSqoopImportsPath(orgId), defaultWithKrbTechUserExec);
+      hdfsClient.setACLForDirectoryWithSubdirectories(paths.getSqoopImportsPath(orgId),
+              defaultWithDefaultKrbTechUserExec);
 
       hdfsClient.createDirectory(paths.getOozieJobsPath(orgId), orgAdmin, orgId, usrAllGroupAll);
       hdfsClient.createDirectory(paths.getUsersPath(orgId), orgAdmin, orgId, usrAllGroupRead);
@@ -171,6 +174,18 @@ public class HdfsGateway implements Authorizable {
 
   @VisibleForTesting
   List<AclEntry> getDefaultAclWithKrbTechUserAction(FsAction groupAction, FsAction techUserAction,
+                                                    String sysOrg) {
+    return HdfsAclBuilder.newInstanceWithDefaultEntries(groupAction)
+            .withUsersAclEntry(ImmutableMap.of(
+                    config.getArcadiaUser(), FsAction.EXECUTE,
+                    config.getVcapUser(), FsAction.EXECUTE))
+            .withUserAclEntry(krbProperties.getTechnicalPrincipal(), techUserAction)
+            .withGroupAclEntry(sysOrg, FsAction.EXECUTE)
+            .withGroupAclEntry(config.getHiveUser(), FsAction.READ_EXECUTE).build();
+  }
+
+  @VisibleForTesting
+  List<AclEntry> getDefaultAclWithDefaultKrbTechUserAction(FsAction groupAction, FsAction techUserAction,
       String sysOrg) {
     return HdfsAclBuilder.newInstanceWithDefaultEntries(groupAction)
             .withUsersAclEntry(ImmutableMap.of(

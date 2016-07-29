@@ -60,6 +60,8 @@ public class HdfsGatewayIntegrationTest {
 
   private FsPermission groupPermission;
 
+  private FsPermission groupAllPermission;
+
   private FsPermission groupReadPermission;
 
   private static final Path TEST_ORG_ROOT = new Path("/org");
@@ -88,6 +90,7 @@ public class HdfsGatewayIntegrationTest {
   public void init() throws IOException {
     userPermission = new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE);
     groupPermission = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
+    groupAllPermission = new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.NONE);
     groupReadPermission = new FsPermission(FsAction.ALL, FsAction.READ_EXECUTE, FsAction.NONE);
 
     fileSystem = fileSystemProvider.getFileSystem();
@@ -99,12 +102,12 @@ public class HdfsGatewayIntegrationTest {
           throws IOException, AuthorizableGatewayException {
     hdfsGateway.addOrganization("intel");
 
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupReadPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupAllPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_USERS_PATH, "intel_admin", groupReadPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_TMP_PATH, "intel_admin", groupPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_SHARED_PATH, "intel_admin", groupPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_APP_PATH, "intel_admin", groupReadPermission);
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_BROKER_PATH, "intel_admin", groupReadPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_BROKER_PATH, "intel_admin", groupAllPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_OOZIE_PATH, "intel_admin", groupPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_SQOOP_PATH, "intel_admin", groupPermission);
 
@@ -126,14 +129,14 @@ public class HdfsGatewayIntegrationTest {
           AuthorizableGatewayException {
     hdfsGateway.addOrganization("intel");
     hdfsGateway.addOrganization("intel");
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupReadPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupAllPermission);
   }
 
   @Test
   public void createOrgWithUsers_directoryExistWithPermissionsAndOwner_createDirectories()
           throws IOException, AuthorizableGatewayException {
     hdfsGateway.addOrganization("intel");
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupReadPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupAllPermission);
     hdfsGateway.addUserToOrg("test_user", "intel");
     checkIfDirectoryExistsWithPermissions(TEST_USER_PATH, "test_user", userPermission);
   }
@@ -142,7 +145,7 @@ public class HdfsGatewayIntegrationTest {
   public void createSecondUserWithSameName_createDirectories_doNothing() throws IOException,
           AuthorizableGatewayException {
     hdfsGateway.addOrganization("intel");
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupReadPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupAllPermission);
     hdfsGateway.addUserToOrg("test_user", "intel");
     hdfsGateway.addUserToOrg("test_user", "intel");
     checkIfDirectoryExistsWithPermissions(TEST_USER_PATH, "test_user", userPermission);
@@ -152,7 +155,7 @@ public class HdfsGatewayIntegrationTest {
   public void deleteEmptyOrg_subDirectoriesNotExists_deleteDirectory() throws IOException,
           AuthorizableGatewayException {
     hdfsGateway.addOrganization("intel");
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupReadPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupAllPermission);
 
     hdfsGateway.removeOrganization("intel");
     assertThat(fileSystem.exists(TEST_ORG_PATH), equalTo(false));
@@ -162,7 +165,7 @@ public class HdfsGatewayIntegrationTest {
   public void deleteOrgWithUsers_subDirectoriesExists_deleteDirectoryWithSubDirectories()
           throws IOException, AuthorizableGatewayException {
     hdfsGateway.addOrganization("intel");
-    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupReadPermission);
+    checkIfDirectoryExistsWithPermissions(TEST_ORG_PATH, "intel_admin", groupAllPermission);
     hdfsGateway.addUserToOrg("test_user", "intel");
     checkIfDirectoryExistsWithPermissions(TEST_USER_PATH, "test_user", userPermission);
 

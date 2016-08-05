@@ -45,6 +45,7 @@ public class HgmGateway implements Authorizable {
   private static final String TECH_GROUP_POSTFIX = "_sys";
 
   private static final String NAME = "hgm";
+  private static final String AUTHGATEWAY = "authgateway";
 
   @Value("${group.mapping.url}")
   private String groupMappingServiceUrl;
@@ -121,9 +122,9 @@ public class HgmGateway implements Authorizable {
 
     createGroupWithUsers("DEPRECATED", Arrays.asList("cf", "h2o", "vcap", "hive"));
 
-    createGroupWithUsers("authgateway", Arrays.asList("authgateway"));
+    createGroupWithUsers(AUTHGATEWAY, Arrays.asList(AUTHGATEWAY));
 
-    createGroupWithUsers(supergroupName, Arrays.asList("authgateway", "hdfs", "mapred", "yarn", "impala"));
+    createGroupWithUsers(supergroupName, Arrays.asList(AUTHGATEWAY, "hdfs", "mapred", "yarn", "impala"));
 
     createGroupWithUsers("hive", Arrays.asList("arcadia-user"));
   }

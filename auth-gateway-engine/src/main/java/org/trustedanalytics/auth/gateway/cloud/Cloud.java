@@ -33,7 +33,7 @@ public class Cloud {
     public List<OrganizationState> getOrganizations() throws AuthorizableGatewayException {
         List<OrganizationState> organizations = new ArrayList<>();
 
-        getResourcesFromEndpoint((page) -> api.getOrganizations(page)).stream().forEach((resources) -> {
+        getResourcesFromEndpoint(page -> api.getOrganizations(page)).stream().forEach(resources -> {
             OrganizationState organization = new OrganizationState(resources.getEntity().getName(),
                     resources.getMetadata().getGuid());
             organization.getUsers().addAll(getUsersForOrganization(organization));
@@ -46,8 +46,8 @@ public class Cloud {
     public List<UserState> getUsersForOrganization(OrganizationState organization) {
         List<UserState> users = new ArrayList<>();
 
-        getResourcesFromEndpoint((page) -> api.getOrganizationUsers(organization.getGuid(), page)).stream()
-                .forEach((resources) ->
+        getResourcesFromEndpoint(page -> api.getOrganizationUsers(organization.getGuid(), page)).stream()
+                .forEach(resources ->
                         users.add(new UserState(resources.getEntity().getName(), resources.getMetadata().getGuid())));
 
         return users;

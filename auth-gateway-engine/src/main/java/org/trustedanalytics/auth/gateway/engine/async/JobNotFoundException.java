@@ -13,15 +13,17 @@
  */
 package org.trustedanalytics.auth.gateway.engine.async;
 
-public class TaskNotFinishedException extends RuntimeException {
+import java.util.UUID;
 
-  private final AsyncRequestState state;
+public class JobNotFoundException extends RuntimeException {
 
-  public TaskNotFinishedException(AsyncRequestState state) {
-    this.state = state;
-  }
+    private final UUID uuid;
 
-  public AsyncRequestState getState() {
-    return state;
-  }
+    public JobNotFoundException(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
 }

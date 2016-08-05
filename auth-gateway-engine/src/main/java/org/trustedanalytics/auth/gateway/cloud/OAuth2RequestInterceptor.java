@@ -19,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.trustedanalytics.auth.gateway.cloud.uaa.UaaApi;
 
-import java.util.function.Supplier;
-
 @Configuration
 public class OAuth2RequestInterceptor implements RequestInterceptor {
 

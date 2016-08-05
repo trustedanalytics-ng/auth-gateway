@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.trustedanalytics.auth.gateway.engine.RequestApplier;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -81,7 +82,7 @@ public class AsyncComponent {
   }
 
   private UUID getUUID() throws AuthorizableGatewayException {
-    Retryer<UUID> guidRetryer = RetryerBuilder.<UUID>newBuilder().retryIfResult((e) -> states.asMap().containsKey(e))
+    Retryer<UUID> guidRetryer = RetryerBuilder.<UUID>newBuilder().retryIfResult(e -> states.asMap().containsKey(e))
             .withStopStrategy(StopStrategies.stopAfterAttempt(5)).build();
     UUID uuid = executeCheckedQuery(() -> {
       try{
@@ -119,7 +120,8 @@ public class AsyncComponent {
   }
 
   private AsyncState requestParser(RequestApplier supplier, UUID uuid) {
-    AsyncState state = states.asMap().get(uuid);
+    AsyncState state = Optional.ofNullable(states.asMap().get(uuid))
+            .orElseThrow(() ->new JobNotFoundException(uuid));
     try {
       Object result = supplier.parseRequest();
       HttpStatus status = HttpStatus.OK;

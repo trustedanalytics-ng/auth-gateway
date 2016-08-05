@@ -15,9 +15,7 @@ package org.trustedanalytics.auth.gateway.hdfs;
 
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.fs.permission.AclEntry;
 import org.apache.hadoop.fs.permission.AclEntryScope;
 import org.apache.hadoop.fs.permission.FsAction;
@@ -112,7 +110,7 @@ public class HdfsClient {
 
   private List<FileStatus> getAllChildens(Path path, boolean recursive) throws IOException {
     List<FileStatus> files = new ArrayList<>();
-    FileStatus statuses[] = fileSystem.listStatus(path);
+    FileStatus[] statuses = fileSystem.listStatus(path);
 
     for(FileStatus status: statuses)
     {

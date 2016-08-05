@@ -35,6 +35,7 @@ import java.util.concurrent.TimeoutException;
 class Engine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
+    private static final String CAN_NOT_FIND_ORGANIZATION = "Can not find organization: ";
 
     private List<Authorizable> supportedAuthorizables;
     private long timeoutInSeconds;
@@ -77,7 +78,7 @@ class Engine {
                 .filter(org -> Objects.equals(org.getGuid(), orgId)).findAny();
 
         if (!organization.isPresent()) {
-            throw new AuthorizableGatewayException("Can not find organization: " + orgId);
+            throw new AuthorizableGatewayException(CAN_NOT_FIND_ORGANIZATION + orgId);
         }
 
         addOrganization(orgId);
@@ -97,7 +98,7 @@ class Engine {
                 .filter(org -> Objects.equals(org.getGuid(), orgId)).findAny();
 
         if (!organization.isPresent()) {
-            throw new AuthorizableGatewayException("Can not find organization: " + orgId);
+            throw new AuthorizableGatewayException(CAN_NOT_FIND_ORGANIZATION + orgId);
         }
 
         organization.get().setSynchronizedState(state.getValidState(organization.get().getGuid()));
@@ -142,7 +143,7 @@ class Engine {
                 .filter(org -> Objects.equals(org.getGuid(), orgId)).findAny();
 
         if (!organization.isPresent()) {
-            throw new AuthorizableGatewayException("Can not find organization: " + orgId);
+            throw new AuthorizableGatewayException(CAN_NOT_FIND_ORGANIZATION + orgId);
         }
 
         organization.get().setSynchronizedState(state.getValidState(organization.get().getGuid()));
@@ -160,7 +161,7 @@ class Engine {
                 .filter(org -> Objects.equals(org.getGuid(), orgId)).findAny();
 
         if (!organization.isPresent()) {
-            throw new AuthorizableGatewayException("Can not find organization: " + orgId);
+            throw new AuthorizableGatewayException(CAN_NOT_FIND_ORGANIZATION + orgId);
         }
 
         Optional<UserState> user = organization.get().getUsers().stream().

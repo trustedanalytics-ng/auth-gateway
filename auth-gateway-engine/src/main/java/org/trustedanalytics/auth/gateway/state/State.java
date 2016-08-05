@@ -13,7 +13,6 @@
  */
 package org.trustedanalytics.auth.gateway.state;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 import org.trustedanalytics.auth.gateway.zookeeper.ZookeeperClient;
 
@@ -21,6 +20,7 @@ import java.util.Objects;
 
 public class State {
 
+    private static final String SETTING_VALID_STATE_FAILED = "Setting valid state failed";
     public static final String BASE_NODE = "/state";
 
     private ZookeeperClient client;
@@ -57,7 +57,7 @@ public class State {
         }
         catch (Exception e)
         {
-            throw new AuthorizableGatewayException("Setting valid state failed", e);
+            throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
         }
     }
 
@@ -68,7 +68,7 @@ public class State {
         }
         catch (Exception e)
         {
-            throw new AuthorizableGatewayException("Setting valid state failed", e);
+            throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
         }
     }
 
@@ -79,7 +79,7 @@ public class State {
         }
         catch (Exception e)
         {
-            throw new AuthorizableGatewayException("Setting valid state failed", e);
+            throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
         }
     }
 
@@ -90,7 +90,7 @@ public class State {
         }
         catch (Exception e)
         {
-            throw new AuthorizableGatewayException("Setting valid state failed", e);
+            throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
         }
     }
 
@@ -101,7 +101,7 @@ public class State {
         }
         catch (Exception e)
         {
-            throw new AuthorizableGatewayException("Setting valid state failed", e);
+            throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
         }
     }
 
@@ -112,7 +112,7 @@ public class State {
         }
         catch (Exception e)
         {
-            throw new AuthorizableGatewayException("Setting valid state failed", e);
+            throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
         }
     }
 }

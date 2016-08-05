@@ -44,7 +44,6 @@ public class ZookeeperClientConfig {
             acl = new ACL(ZooDefs.Perms.ALL, new Id("digest",
                     DigestAuthenticationProvider.generateDigest(String.format("%s:%s",
                             zookeeperConfig.getUsername(), zookeeperConfig.getPassword()))));
-        ZookeeperClient client = new ZookeeperClient(curator, acl, zookeeperConfig.getNode());
-        return client;
+        return new ZookeeperClient(curator, acl, zookeeperConfig.getNode());
     }
 }

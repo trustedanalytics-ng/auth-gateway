@@ -53,7 +53,7 @@ class Engine {
     public PlatformState synchronize() throws AuthorizableGatewayException {
         List<CompletableFuture<Void>> tasks = new LinkedList<>();
         for (Authorizable authorizable : supportedAuthorizables) {
-            tasks.add(createFutureForMethod(() -> authorizable.synchronize(), authorizable.getName(),
+            tasks.add(createFutureForMethod(authorizable::synchronize, authorizable.getName(),
                     "synchronizing cf"));
         }
 

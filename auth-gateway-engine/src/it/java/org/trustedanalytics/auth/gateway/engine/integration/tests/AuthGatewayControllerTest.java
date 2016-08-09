@@ -35,7 +35,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.trustedanalytics.auth.gateway.Application;
-import org.trustedanalytics.auth.gateway.engine.WebApplicationConfig;
+import org.trustedanalytics.auth.gateway.engine.WebSecurityConfig;
 import org.trustedanalytics.auth.gateway.state.State;
 import org.trustedanalytics.auth.gateway.zookeeper.ZookeeperClient;
 
@@ -60,7 +60,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {Application.class,
         TestConfiguration.class,
-        WebApplicationConfig.class,
+        WebSecurityConfig.class,
         OAuth2Helper.class,
         AuthorizationServerConfig.class,
         CloudConfig.class})

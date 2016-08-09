@@ -87,7 +87,7 @@ class AuthGatewayController {
   @RequestMapping(value = "/synchronize", method = RequestMethod.PUT)
   public AuthgatewayResponse synchronize(@RequestParam(value = "async", defaultValue = "false") Boolean async)
           throws AuthorizableGatewayException {
-    return callRequest(() -> authGatewayEngine.synchronize(), async);
+    return callRequest(authGatewayEngine::synchronize, async);
   }
 
   @ApiOperation("Synchronizing CF organization with CDH")
@@ -110,7 +110,7 @@ class AuthGatewayController {
   @RequestMapping(value = "/state", method = RequestMethod.GET)
   public AuthgatewayResponse state(@RequestParam(value = "async", defaultValue = "false") Boolean async)
           throws AuthorizableGatewayException {
-    return callRequest(() -> authGatewayEngine.state(), async);
+    return callRequest(authGatewayEngine::state, async);
   }
 
   @ApiOperation("Get organization state")

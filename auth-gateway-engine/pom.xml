@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.trustedanalytics</groupId>
         <artifactId>auth-gateway</artifactId>
-        <version>0.8.7</version>
+        <version>0.8.8</version>
     </parent>
     <artifactId>auth-gateway-engine</artifactId>
 
     <properties>
         <start-class>org.trustedanalytics.auth.gateway.Application</start-class>
-        <jacoco-measurement-instructions>0.6000</jacoco-measurement-instructions>
         <jacoco-measurement-branches>0.2500</jacoco-measurement-branches>
+        <jacoco-measurement-instructions>0.59885</jacoco-measurement-instructions>
         <jacoco-measurement-lines>0.6000</jacoco-measurement-lines>
         <jacoco-measurement-classes>0.8500</jacoco-measurement-classes>
     </properties>
@@ -73,6 +73,11 @@
             <groupId>org.trustedanalytics</groupId>
             <artifactId>yarn-auth-gateway</artifactId>
             <version>${auth-gateway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.trustedanalytics</groupId>
+            <artifactId>rest-error-handling</artifactId>
+            <version>0.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

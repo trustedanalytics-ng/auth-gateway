@@ -1,5 +1,3 @@
-security:
-    ignored: /v2/api-docs
 engine:
   timeout: 30
   asyncTimeout: 1000

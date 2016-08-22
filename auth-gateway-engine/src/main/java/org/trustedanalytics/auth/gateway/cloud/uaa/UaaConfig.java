@@ -13,11 +13,6 @@
  */
 package org.trustedanalytics.auth.gateway.cloud.uaa;
 
-import feign.Feign;
-import feign.auth.BasicAuthRequestInterceptor;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import feign.slf4j.Slf4jLogger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,22 +20,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class UaaConfig {
 
-  @Value("${cloud.uaa}")
-  private String uaaApi;
+    @Value("${cloud.uaa}")
+    private String uaaApi;
 
-  @Value("${cloud.clientId}")
-  private String clientId;
+    @Value("${cloud.clientId}")
+    private String clientId;
 
-  @Value("${cloud.clientPassword}")
-  private String clientPassword;
+    @Value("${cloud.clientPassword}")
+    private String clientPassword;
 
-  @Bean
-  public UaaApi getUaaApi() {
-    return Feign.builder().encoder(new JacksonEncoder())
-            .decoder(new JacksonDecoder())
-            .logger(new Slf4jLogger(UaaApi.class))
-            .requestInterceptor(new BasicAuthRequestInterceptor(clientId, clientPassword))
-            .logLevel(feign.Logger.Level.BASIC)
-            .target(UaaApi.class, uaaApi);
-  }
+    @Bean
+    public UaaApi getUaaApi() {
+        return new CachedUaaApiClient(new UaaApiClient(clientId, clientPassword, uaaApi));
+    }
 }

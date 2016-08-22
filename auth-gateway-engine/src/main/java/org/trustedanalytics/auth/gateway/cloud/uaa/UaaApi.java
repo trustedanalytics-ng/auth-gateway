@@ -18,8 +18,8 @@ import feign.Headers;
 import feign.RequestLine;
 
 public interface UaaApi {
-  @RequestLine("POST /oauth/token")
-  @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
-  @Body("grant_type=client_credentials")
-  AccessTokenResponse authenticate();
+    @RequestLine("POST /oauth/token")
+    @Headers("Content-Type: application/x-www-form-urlencoded;charset=utf-8")
+    @Body("grant_type=client_credentials")
+    AccessTokenResponse authenticate();
 }

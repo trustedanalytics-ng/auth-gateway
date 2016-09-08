@@ -29,10 +29,10 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class CachedUaaApiClient implements UaaApi {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(CachedUaaApiClient.class);
-    private final static TimeUnit TIME_UNIT = SECONDS;
-    private final static String CACHED_TOKEN = "CACHED_TOKEN";
-    private final static long ACCESS_TIME = 60;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CachedUaaApiClient.class);
+    private static final TimeUnit TIME_UNIT = SECONDS;
+    private static final String CACHED_TOKEN = "CACHED_TOKEN";
+    private static final long ACCESS_TIME = 60;
     private final LoadingCache<String, AccessTokenResponse> tokenCache;
 
     public CachedUaaApiClient(UaaApi uaaApi) {

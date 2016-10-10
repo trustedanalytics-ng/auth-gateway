@@ -13,7 +13,8 @@
  */
 package org.trustedanalytics.auth.gateway.zookeeper;
 
-import lombok.Getter;
+import java.nio.charset.Charset;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
@@ -23,66 +24,64 @@ import org.springframework.context.annotation.Configuration;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManager;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManagerFactory;
 
-import java.nio.charset.Charset;
+import lombok.Getter;
 
 @Configuration
 public class ZookeeperConfig {
 
-    @Value("${zookeeper.clusterUrl}")
-    @Getter
-    private String quorum;
+  @Value("${zookeeper.clusterUrl}")
+  @Getter
+  private String quorum;
 
-    @Value("${zookeeper.user}")
-    @Getter
-    private String username;
+  @Value("${zookeeper.user}")
+  @Getter
+  private String username;
 
-    @Value("${zookeeper.password}")
-    @Getter
-    private String password;
+  @Value("${zookeeper.password}")
+  @Getter
+  private String password;
 
-    @Value("${zookeeper.node}")
-    @Getter
-    private String node;
+  @Value("${zookeeper.node}")
+  @Getter
+  private String node;
 
-    @Value("${kerberos.enabled}")
-    @Getter
-    private boolean kerberos;
+  @Value("${kerberos.enabled}")
+  @Getter
+  private boolean kerberos;
 
-    @Value("${kerberos.user}")
-    @Getter
-    private String kerberosUser;
+  @Value("${kerberos.user}")
+  @Getter
+  private String kerberosUser;
 
-    @Value("${kerberos.password}")
-    @Getter
-    private String kerberosPassword;
+  @Value("${kerberos.keytab}")
+  @Getter
+  private String kerberosKeytab;
 
-    @Value("${kerberos.kdc}")
-    @Getter
-    private String kdc;
+  @Value("${kerberos.kdc}")
+  @Getter
+  private String kdc;
 
-    @Value("${kerberos.realm}")
-    @Getter
-    private String realm;
+  @Value("${kerberos.realm}")
+  @Getter
+  private String realm;
 
-    private void logWithCredentials() throws Exception
-    {
-        System.setProperty("zookeeper.sasl.clientconfig", kerberosUser);
-        KrbLoginManager loginManager = KrbLoginManagerFactory.getInstance()
-                .getKrbLoginManagerInstance(kdc, realm);
-        loginManager.loginWithCredentials(kerberosUser, kerberosPassword.toCharArray());
-    }
+  private void logWithCredentials() throws Exception {
+    System.setProperty("zookeeper.sasl.clientconfig", kerberosUser);
+    KrbLoginManager loginManager =
+        KrbLoginManagerFactory.getInstance().getKrbLoginManagerInstance(kdc, realm);
+    loginManager.loginWithKeyTab(kerberosUser, kerberosKeytab);
+  }
 
-    @Bean(initMethod = "start", destroyMethod = "close")
-    public CuratorFramework getCuratorClient() throws Exception
-    {
-        CuratorFrameworkFactory.Builder builder =  CuratorFrameworkFactory.builder()
-                .connectString(quorum).retryPolicy(new ExponentialBackoffRetry(1000, 3));
-        if(kerberos)
-            logWithCredentials();
-        else
-            builder.authorization("digest", String.format("%s:%s", this.username, this.password)
-                    .getBytes(Charset.defaultCharset()));
+  @Bean(initMethod = "start", destroyMethod = "close")
+  public CuratorFramework getCuratorClient() throws Exception {
+    CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder()
+        .connectString(quorum).retryPolicy(new ExponentialBackoffRetry(1000, 3));
+    if (kerberos)
+      logWithCredentials();
+    else
+      builder.authorization("digest",
+          String.format("%s:%s", this.username, this.password).getBytes(Charset.defaultCharset()));
 
-        return builder.build();
-    }
+    return builder.build();
+  }
 }

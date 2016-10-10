@@ -14,8 +14,9 @@
 package org.trustedanalytics.auth.gateway.utils;
 
 public final class Qualifiers {
-  public static final String KERBEROS = "kerberos-warehouse-auth-gateway";
+  public static final String KERBEROS = "krb-warehouse-auth-gateway";
   public static final String SIMPLE = "warehouse-auth-gateway";
+  public static final String CONFIGURATION = "hive-configuration";
 
   private Qualifiers() {
   }

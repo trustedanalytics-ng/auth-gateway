@@ -11,19 +11,12 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+package org.trustedanalytics.auth.gateway.zookeeper.utils;
 
-package org.trustedanalytics.auth.gateway.hbase.kerberos;
+public final class Qualifiers {
+  public static final String KERBEROS = "krb-zookeeper-auth-gateway";
+  public static final String SIMPLE = "zookeeper-auth-gateway";
 
-import com.google.common.collect.ImmutableMap;
-
-public class Credentials {
-    private final ImmutableMap<String, Object> credentialsMap;
-
-    public Credentials(ImmutableMap<String, Object> credentialsMap) {
-        this.credentialsMap = credentialsMap;
-    }
-
-    public ImmutableMap<String, Object> getCredentialsMap() {
-        return this.credentialsMap;
-    }
+  private Qualifiers() {
+  }
 }

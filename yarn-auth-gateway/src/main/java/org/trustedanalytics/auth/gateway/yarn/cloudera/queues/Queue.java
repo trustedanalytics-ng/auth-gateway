@@ -15,12 +15,12 @@ package org.trustedanalytics.auth.gateway.yarn.cloudera.queues;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @ToString
 @Builder(builderMethodName = "queueBuilder")

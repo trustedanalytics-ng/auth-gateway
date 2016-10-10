@@ -15,13 +15,14 @@ package org.trustedanalytics.auth.gateway.yarn.cloudera.config;
 
 import javax.validation.constraints.NotNull;
 
-import lombok.Getter;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.trustedanalytics.auth.gateway.yarn.utils.Qualifiers;
 
-@Profile("yarn-auth-gateway")
+import lombok.Getter;
+
+@Profile(Qualifiers.YARN)
 @Configuration
 public class ClouderaConfiguration {
 

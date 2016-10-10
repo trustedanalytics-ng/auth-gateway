@@ -13,6 +13,8 @@
  */
 package org.trustedanalytics.auth.gateway.zookeeper;
 
+import java.security.NoSuchAlgorithmException;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
@@ -21,29 +23,26 @@ import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import java.security.NoSuchAlgorithmException;
 
 @Configuration
 public class ZookeeperClientConfig {
 
-    @Autowired
-    private CuratorFramework curator;
+  @Autowired
+  private CuratorFramework curator;
 
-    @Autowired
-    private ZookeeperConfig zookeeperConfig;
+  @Autowired
+  private ZookeeperConfig zookeeperConfig;
 
-    public ZookeeperClientConfig() {
-    }
+  public ZookeeperClientConfig() {}
 
-    @Bean(initMethod = "init", destroyMethod = "destroy")
-    public ZookeeperClient getZookeeperClient() throws NoSuchAlgorithmException{
-        ACL acl;
-        if (zookeeperConfig.isKerberos())
-            acl = new ACL(ZooDefs.Perms.ALL, new Id("sasl", zookeeperConfig.getUsername()));
-        else
-            acl = new ACL(ZooDefs.Perms.ALL, new Id("digest",
-                    DigestAuthenticationProvider.generateDigest(String.format("%s:%s",
-                            zookeeperConfig.getUsername(), zookeeperConfig.getPassword()))));
-        return new ZookeeperClient(curator, acl, zookeeperConfig.getNode());
-    }
+  @Bean(initMethod = "init", destroyMethod = "destroy")
+  public ZookeeperClient getZookeeperClient() throws NoSuchAlgorithmException {
+    ACL acl;
+    if (zookeeperConfig.isKerberos())
+      acl = new ACL(ZooDefs.Perms.ALL, new Id("sasl", zookeeperConfig.getUsername()));
+    else
+      acl = new ACL(ZooDefs.Perms.ALL, new Id("digest", DigestAuthenticationProvider.generateDigest(
+          String.format("%s:%s", zookeeperConfig.getUsername(), zookeeperConfig.getPassword()))));
+    return new ZookeeperClient(curator, acl, zookeeperConfig.getNode());
+  }
 }

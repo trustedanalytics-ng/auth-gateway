@@ -16,5 +16,5 @@ package org.trustedanalytics.auth.gateway.cloud;
 import org.trustedanalytics.auth.gateway.cloud.api.ApiResponse;
 
 public interface CloudApiRequest {
-    ApiResponse getResponse(int page);
+  ApiResponse getResponse(int page);
 }

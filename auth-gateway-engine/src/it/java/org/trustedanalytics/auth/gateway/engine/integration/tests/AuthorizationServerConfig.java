@@ -43,6 +43,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
   @Value("${jwt.token.privateKey}")
   private String privateKey;
 
+  @Autowired
+  private AuthenticationManager authenticationManager;
+
   @Bean
   public JwtAccessTokenConverter accessTokenConverter() throws Exception {
     JwtAccessTokenConverter jwt = new JwtAccessTokenConverter();
@@ -51,9 +54,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     jwt.afterPropertiesSet();
     return jwt;
   }
-
-  @Autowired
-  private AuthenticationManager authenticationManager;
 
   @Override
   public void configure(final AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
@@ -66,9 +66,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
   public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
     clients.inMemory()
         .withClient(AuthGatewayControllerTest.ADMIN_NAME)
-        .scopes("cloud_controller.admin")
-        .and()
-        .withClient(AuthGatewayControllerTest.ORG_MANAGER_NAME)
-        .scopes("cloud_controller.write", "cloud_controller.read");
+        .scopes("tap.admin");
   }
 }

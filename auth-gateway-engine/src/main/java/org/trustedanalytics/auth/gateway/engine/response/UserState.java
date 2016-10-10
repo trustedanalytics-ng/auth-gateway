@@ -13,21 +13,23 @@
  */
 package org.trustedanalytics.auth.gateway.engine.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 import org.trustedanalytics.auth.gateway.engine.AuthgatewayResponse;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Data;
 
 @Data
 public class UserState implements AuthgatewayResponse {
-    private String name;
+  private String name;
 
-    private String guid;
+  private String guid;
 
-    @JsonProperty("synchronized")
-    private boolean synchronizedState;
+  @JsonProperty("synchronized")
+  private boolean synchronizedState;
 
-    public UserState(String name, String guid) {
-        this.guid = guid;
-        this.name = name;
-    }
+  public UserState(String name, String guid) {
+    this.guid = guid;
+    this.name = name;
+  }
 }

@@ -16,9 +16,10 @@ package org.trustedanalytics.auth.gateway.hdfs;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
+import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
 
 @SpringBootApplication
-@Profile({"test", "hdfs-auth-gateway"})
+@Profile({Qualifiers.TEST, Qualifiers.SIMPLE})
 public class TestIntegrationApplication {
   public static void main(String[] args) {
     SpringApplication.run(TestIntegrationApplication.class, args);

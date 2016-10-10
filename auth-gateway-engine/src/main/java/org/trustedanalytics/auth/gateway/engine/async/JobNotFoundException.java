@@ -17,13 +17,13 @@ import java.util.UUID;
 
 public class JobNotFoundException extends RuntimeException {
 
-    private final UUID uuid;
+  private final UUID uuid;
 
-    public JobNotFoundException(UUID uuid) {
-        this.uuid = uuid;
-    }
+  public JobNotFoundException(UUID uuid) {
+    this.uuid = uuid;
+  }
 
-    public UUID getUuid() {
-        return uuid;
-    }
+  public UUID getUuid() {
+    return uuid;
+  }
 }

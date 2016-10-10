@@ -3,10 +3,10 @@ engine:
   asyncTimeout: 0
   version: SOME_RAND
 cloud:
-    api: ${vcap.services.sso.credentials.apiEndpoint:localhost:80808}
-    clientId: ${vcap.services.sso.credentials.clientId:admin}
-    clientPassword: ${vcap.services.sso.credentials.clientPassword:admin}
-    uaa: ${vcap.services.sso.credentials.uaaUri:localhost:8080}
+  api: ${vcap.services.sso.credentials.apiEndpoint:localhost:80808}
+  clientId: ${vcap.services.sso.credentials.clientId:admin}
+  clientPassword: ${vcap.services.sso.credentials.clientPassword:admin}
+  uaa: ${vcap.services.sso.credentials.uaaUri:localhost:8080}
 zookeeper:
   clusterUrl: ${zk.cluster.url:localhost:2181}
   user: ${hdfs.superuser:}
@@ -14,13 +14,22 @@ zookeeper:
   node: ${zk.node:/auth-gateway}
 kerberos:
   user: ${krb.user:none}
-  password: ${krb.password:null}
+  keytab: ${krb.keytab:null}
   kdc: ${krb.kdc:}
   realm: ${krb.realm:}
   enabled: ${krb.enabled:false}
 hdfs:
   superUser: ${hdfs.superuser:}
-  clientKeytab: ${hdfs.keytab:}
+  keytabPath: ${hdfs.keytab.path:}
+  hiveUser: ${hdfs.hiveuser:}
+  cfUser: ${hdfs.cfuser:cf}
+  arcadiaUser: ${hdfs.arcadiauser:arcadia-user:}
+  vcapUser: ${hdfs.vcapuser:vcap:}
+  configPath: ${hdfs.config.path:}
+hbase:
+  configPath: ${hbase.config.path:}
+hive:
+  configPath: ${hive.config.path:}
 group.mapping:
   url: ${hgm.url}
   kerberos:
@@ -37,7 +46,7 @@ sentry.client:
   clientKeyTab: ${sentry.keytab:}
   superUser: ${sentry.superuser:hive}
 spring.oauth2.resource:
-    id: auth_gateway
+    id: tap
     jwt:
       keyUri: http://localhost:/8080/oauth/token_key
 jwt:
@@ -81,4 +90,4 @@ jwt:
      fudkijw0dnh28LJqbkFF5wLNtATzyCfzjp+czrPMn9uqLNKt/iVD
      -----END RSA PRIVATE KEY-----
 
-logging.level.org.apache.zookeeper: DEBUG
+logging.level.org.apache.zookeeper: INFO

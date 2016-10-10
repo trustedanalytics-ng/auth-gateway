@@ -13,8 +13,9 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.AclEntry;
 import org.apache.hadoop.fs.permission.FsAction;
@@ -23,17 +24,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.trustedanalytics.auth.gateway.hdfs.config.ExternalConfiguration;
-import org.trustedanalytics.auth.gateway.hdfs.config.FileSystemProvider;
+import org.trustedanalytics.auth.gateway.hdfs.fs.FileSystemProvider;
 import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
 import org.trustedanalytics.auth.gateway.hdfs.utils.PathCreator;
 import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
-import java.io.IOException;
-import java.util.List;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 
-@Profile(Qualifiers.HDFS)
+@Profile({Qualifiers.SIMPLE, Qualifiers.KERBEROS})
 @Configuration
 public class HdfsGateway implements Authorizable {
 

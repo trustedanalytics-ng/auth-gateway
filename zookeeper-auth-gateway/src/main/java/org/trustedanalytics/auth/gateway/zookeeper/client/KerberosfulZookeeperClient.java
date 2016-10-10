@@ -13,18 +13,18 @@
  */
 package org.trustedanalytics.auth.gateway.zookeeper.client;
 
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
+
+import java.util.List;
+import java.util.Objects;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Objects;
-
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
 
 /**
  *
@@ -55,7 +55,7 @@ public class KerberosfulZookeeperClient implements ZookeeperClient {
       throws Exception {
 
     try {
-      curatorClient.create()
+      curatorClient.create().creatingParentsIfNeeded()
           .withACL(singletonList(new ACL(permission.getPerms(), new Id("sasl", username))))
           .forPath(pathOps.makePath(znodePath));
     } catch (KeeperException.NodeExistsException e) {

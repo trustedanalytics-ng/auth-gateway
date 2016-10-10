@@ -15,9 +15,7 @@ package org.trustedanalytics.auth.gateway.hdfs;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.io.IOException;
@@ -37,7 +35,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.trustedanalytics.auth.gateway.hdfs.config.ExternalConfiguration;
-import org.trustedanalytics.auth.gateway.hdfs.config.FileSystemProvider;
+import org.trustedanalytics.auth.gateway.hdfs.fs.FileSystemProvider;
 
 import com.google.common.collect.ImmutableMap;
 

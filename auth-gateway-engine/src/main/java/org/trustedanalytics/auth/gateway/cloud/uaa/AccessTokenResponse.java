@@ -14,6 +14,7 @@
 package org.trustedanalytics.auth.gateway.cloud.uaa;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 
 @Data

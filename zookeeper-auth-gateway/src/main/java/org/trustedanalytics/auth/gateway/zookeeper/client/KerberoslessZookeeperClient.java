@@ -37,7 +37,7 @@ public class KerberoslessZookeeperClient implements ZookeeperClient {
       throws Exception {
 
     try {
-      curatorClient.create().forPath(pathOps.makePath(znodePath));
+      curatorClient.create().creatingParentsIfNeeded().forPath(pathOps.makePath(znodePath));
     } catch (KeeperException.NodeExistsException e) {
       LOGGER.info("Caught: '" + e.getMessage() + "' while creating node. Nothing to do.", e);
     }

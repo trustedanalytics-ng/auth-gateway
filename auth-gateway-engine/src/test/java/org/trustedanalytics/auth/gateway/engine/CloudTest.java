@@ -13,6 +13,12 @@
  */
 package org.trustedanalytics.auth.gateway.engine;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.trustedanalytics.auth.gateway.cloud.Cloud;
@@ -24,15 +30,6 @@ import org.trustedanalytics.auth.gateway.cloud.api.ApiResponse;
 import org.trustedanalytics.auth.gateway.engine.response.OrganizationState;
 import org.trustedanalytics.auth.gateway.engine.response.UserState;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 public class CloudTest {
 

@@ -14,20 +14,19 @@
 package org.trustedanalytics.auth.gateway.engine.integration.tests;
 
 import org.apache.curator.test.TestingServer;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ZookeeperServerFactory {
 
-    public ZookeeperServerFactory() { }
+  public ZookeeperServerFactory() {}
 
-    @Bean
-    public TestingServer initEmbededZKServer() throws Exception {
-        TestingServer zkServer = new TestingServer(2181);
-        zkServer.start();
+  @Bean
+  public TestingServer initEmbededZKServer() throws Exception {
+    TestingServer zkServer = new TestingServer(2181);
+    zkServer.start();
 
-        return zkServer;
-    }
+    return zkServer;
+  }
 }

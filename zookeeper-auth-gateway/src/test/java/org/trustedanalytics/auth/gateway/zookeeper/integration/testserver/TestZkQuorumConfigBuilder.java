@@ -14,11 +14,11 @@
 
 package org.trustedanalytics.auth.gateway.zookeeper.integration.testserver;
 
+import java.util.Properties;
+
 import org.apache.curator.test.InstanceSpec;
 import org.apache.curator.test.QuorumConfigBuilder;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig;
-
-import java.util.Properties;
 
 public class TestZkQuorumConfigBuilder extends QuorumConfigBuilder {
 

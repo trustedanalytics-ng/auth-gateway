@@ -13,106 +13,84 @@
  */
 package org.trustedanalytics.auth.gateway.state;
 
+import java.util.Objects;
+
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 import org.trustedanalytics.auth.gateway.zookeeper.ZookeeperClient;
 
-import java.util.Objects;
-
 public class State {
 
-    private static final String SETTING_VALID_STATE_FAILED = "Setting valid state failed";
-    public static final String BASE_NODE = "/state";
+  private static final String SETTING_VALID_STATE_FAILED = "Setting valid state failed";
+  public static final String BASE_NODE = "/state";
 
-    private ZookeeperClient client;
-    private String version;
+  private ZookeeperClient client;
+  private String version;
 
-    public State(ZookeeperClient client, String version)
-    {
-        this.client = client;
-        this.version = version;
+  public State(ZookeeperClient client, String version) {
+    this.client = client;
+    this.version = version;
+  }
+
+  public void init() throws Exception {
+    if (client.checkExists(BASE_NODE)) {
+      String newVersion = new String(client.getNodeData(BASE_NODE));
+
+      if (!Objects.equals(newVersion, this.version))
+        client.deleteNode(BASE_NODE);
     }
 
-    public void init() throws Exception
-    {
-        if(client.checkExists(BASE_NODE))
-        {
-            String newVersion = new String(client.getNodeData(BASE_NODE));
+    client.createNode(BASE_NODE, this.version.getBytes());
+  }
 
-            if(!Objects.equals(newVersion, this.version))
-                client.deleteNode(BASE_NODE);
-        }
+  private String getPath(String... args) {
+    return String.join("/", BASE_NODE, String.join("/", args));
+  }
 
-        client.createNode(BASE_NODE, this.version.getBytes());
+  public void setValidState(String orgId) throws AuthorizableGatewayException {
+    try {
+      client.createNode(getPath(orgId), new byte[] {});
+    } catch (Exception e) {
+      throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
     }
+  }
 
-    private String getPath(String... args)
-    {
-        return String.join("/", BASE_NODE, String.join("/", args));
+  public void setValidState(String orgId, String userId) throws AuthorizableGatewayException {
+    try {
+      client.createNode(getPath(orgId, userId), new byte[] {});
+    } catch (Exception e) {
+      throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
     }
+  }
 
-    public void setValidState(String orgId) throws AuthorizableGatewayException
-    {
-        try {
-            client.createNode(getPath(orgId), new byte[]{});
-        }
-        catch (Exception e)
-        {
-            throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
-        }
+  public void unsetValidState(String orgId) throws AuthorizableGatewayException {
+    try {
+      client.deleteNode(getPath(orgId));
+    } catch (Exception e) {
+      throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
     }
+  }
 
-    public void setValidState(String orgId, String userId) throws AuthorizableGatewayException
-    {
-        try {
-            client.createNode(getPath(orgId, userId), new byte[]{});
-        }
-        catch (Exception e)
-        {
-            throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
-        }
+  public void unsetValidState(String orgId, String userId) throws AuthorizableGatewayException {
+    try {
+      client.deleteNode(getPath(orgId, userId));
+    } catch (Exception e) {
+      throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
     }
+  }
 
-    public void unsetValidState(String orgId) throws AuthorizableGatewayException
-    {
-        try {
-            client.deleteNode(getPath(orgId));
-        }
-        catch (Exception e)
-        {
-            throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
-        }
+  public boolean getValidState(String orgId) throws AuthorizableGatewayException {
+    try {
+      return client.checkExists(getPath(orgId));
+    } catch (Exception e) {
+      throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
     }
+  }
 
-    public void unsetValidState(String orgId, String userId) throws AuthorizableGatewayException
-    {
-        try {
-            client.deleteNode(getPath(orgId, userId));
-        }
-        catch (Exception e)
-        {
-            throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
-        }
+  public boolean getValidState(String orgId, String userId) throws AuthorizableGatewayException {
+    try {
+      return client.checkExists(getPath(orgId, userId));
+    } catch (Exception e) {
+      throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
     }
-
-    public boolean getValidState(String orgId) throws AuthorizableGatewayException
-    {
-        try {
-            return client.checkExists(getPath(orgId));
-        }
-        catch (Exception e)
-        {
-            throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
-        }
-    }
-
-    public boolean getValidState(String orgId, String userId) throws AuthorizableGatewayException
-    {
-        try {
-            return client.checkExists(getPath(orgId, userId));
-        }
-        catch (Exception e)
-        {
-            throw new AuthorizableGatewayException(SETTING_VALID_STATE_FAILED, e);
-        }
-    }
+  }
 }

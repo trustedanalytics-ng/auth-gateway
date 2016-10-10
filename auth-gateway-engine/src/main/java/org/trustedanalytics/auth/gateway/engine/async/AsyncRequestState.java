@@ -13,9 +13,9 @@
  */
 package org.trustedanalytics.auth.gateway.engine.async;
 
-import lombok.Data;
-
 import java.util.Date;
+
+import lombok.Data;
 
 @Data
 public class AsyncRequestState {

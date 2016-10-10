@@ -15,6 +15,7 @@ package org.trustedanalytics.auth.gateway.yarn.cloudera.queues;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Builder;
 import lombok.Getter;
 

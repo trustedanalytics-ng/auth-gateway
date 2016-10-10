@@ -15,9 +15,6 @@ package org.trustedanalytics.auth.gateway.yarn.cloudera;
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.ToString;
-
 import org.trustedanalytics.auth.gateway.yarn.PoolConfiguration;
 import org.trustedanalytics.auth.gateway.yarn.cloudera.queues.Queue;
 
@@ -25,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+
+import lombok.Getter;
+import lombok.ToString;
 
 @ToString
 public final class YarnScheduledAllocations implements PoolConfiguration {

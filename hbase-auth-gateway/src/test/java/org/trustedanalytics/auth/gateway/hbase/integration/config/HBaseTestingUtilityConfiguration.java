@@ -14,34 +14,27 @@
 
 package org.trustedanalytics.auth.gateway.hbase.integration.config;
 
-import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
-import org.apache.hadoop.hbase.security.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
+import org.trustedanalytics.auth.gateway.hbase.utils.Qualifiers;
 
-@ActiveProfiles("test")
+@ActiveProfiles(Qualifiers.TEST)
 @Configuration
 public class HBaseTestingUtilityConfiguration {
 
+  @Autowired
+  @Qualifier(Qualifiers.SIMPLE)
+  private org.apache.hadoop.conf.Configuration configuration;
+
   @Bean(destroyMethod = "shutdownMiniCluster")
   public HBaseTestingUtility getHBaseTestingUtility() throws Exception {
-    org.apache.hadoop.conf.Configuration configuration = HBaseConfiguration.create();
-    configuration.set("fs.hdfs.impl",
-        "org.trustedanalytics.auth.gateway.hbase.integration.config.FakeFS");
-
-    configuration.set("hbase.security.authorization", "true");
-    configuration.set("hbase.coprocessor.master.classes",
-        "org.apache.hadoop.hbase.security.access.AccessController");
-    configuration.set("hbase.coprocessor.region.classes",
-        "org.apache.hadoop.hbase.security.token.TokenProvider,org.apache.hadoop.hbase.security.access.AccessController");
-    configuration.set("hbase.superuser", System.getProperty("user.name"));
-
     HBaseTestingUtility utility = new HBaseTestingUtility(configuration);
 
     utility.startMiniCluster();
-
     return utility;
   }
 }

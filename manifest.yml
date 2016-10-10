@@ -2,7 +2,7 @@
 applications:
 - name: auth-gateway
   buildpack: java_buildpack
-  path: target/auth-gateway-0.7.8.jar
+  path: target/auth-gateway-0.8.3.jar
   services:
     - sso
   env:

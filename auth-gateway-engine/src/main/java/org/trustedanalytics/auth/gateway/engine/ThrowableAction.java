@@ -17,5 +17,5 @@ import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
 @FunctionalInterface
 interface ThrowableAction {
-    void apply() throws AuthorizableGatewayException;
+  void apply() throws AuthorizableGatewayException;
 }

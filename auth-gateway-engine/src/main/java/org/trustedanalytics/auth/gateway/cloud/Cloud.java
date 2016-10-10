@@ -13,56 +13,56 @@
  */
 package org.trustedanalytics.auth.gateway.cloud;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.trustedanalytics.auth.gateway.cloud.api.ApiResources;
 import org.trustedanalytics.auth.gateway.cloud.api.ApiResponse;
 import org.trustedanalytics.auth.gateway.engine.response.OrganizationState;
 import org.trustedanalytics.auth.gateway.engine.response.UserState;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Cloud {
 
-    private CloudApi api;
+  private CloudApi api;
 
-    public Cloud(CloudApi api) {
-        this.api = api;
-    }
+  public Cloud(CloudApi api) {
+    this.api = api;
+  }
 
-    public List<OrganizationState> getOrganizations() throws AuthorizableGatewayException {
-        List<OrganizationState> organizations = new ArrayList<>();
+  public List<OrganizationState> getOrganizations() throws AuthorizableGatewayException {
+    List<OrganizationState> organizations = new ArrayList<>();
 
-        getResourcesFromEndpoint(page -> api.getOrganizations(page)).stream().forEach(resources -> {
-            OrganizationState organization = new OrganizationState(resources.getEntity().getName(),
-                    resources.getMetadata().getGuid());
-            organization.getUsers().addAll(getUsersForOrganization(organization));
-            organizations.add(organization);
-        });
+    getResourcesFromEndpoint(page -> api.getOrganizations(page)).stream().forEach(resources -> {
+      OrganizationState organization =
+          new OrganizationState(resources.getEntity().getName(), resources.getMetadata().getGuid());
+      organization.getUsers().addAll(getUsersForOrganization(organization));
+      organizations.add(organization);
+    });
 
-        return organizations;
-    }
+    return organizations;
+  }
 
-    public List<UserState> getUsersForOrganization(OrganizationState organization) {
-        List<UserState> users = new ArrayList<>();
+  public List<UserState> getUsersForOrganization(OrganizationState organization) {
+    List<UserState> users = new ArrayList<>();
 
-        getResourcesFromEndpoint(page -> api.getOrganizationUsers(organization.getGuid(), page)).stream()
-                .forEach(resources ->
-                        users.add(new UserState(resources.getEntity().getName(), resources.getMetadata().getGuid())));
+    getResourcesFromEndpoint(page -> api.getOrganizationUsers(organization.getGuid(), page))
+        .stream().forEach(resources -> users.add(
+            new UserState(resources.getEntity().getName(), resources.getMetadata().getGuid())));
 
-        return users;
-    }
+    return users;
+  }
 
-    private List<ApiResources> getResourcesFromEndpoint(CloudApiRequest request) {
-        return getResourcesFromEndpoint(request, 1);
-    }
+  private List<ApiResources> getResourcesFromEndpoint(CloudApiRequest request) {
+    return getResourcesFromEndpoint(request, 1);
+  }
 
-    private List<ApiResources> getResourcesFromEndpoint(CloudApiRequest request, int page) {
-        ApiResponse response = request.getResponse(page);
-        List<ApiResources> resources = response.getResources();
-        if (response.getNextUrl() != null)
-            resources.addAll(getResourcesFromEndpoint(request, page + 1));
+  private List<ApiResources> getResourcesFromEndpoint(CloudApiRequest request, int page) {
+    ApiResponse response = request.getResponse(page);
+    List<ApiResources> resources = response.getResources();
+    if (response.getNextUrl() != null)
+      resources.addAll(getResourcesFromEndpoint(request, page + 1));
 
-        return resources;
-    }
+    return resources;
+  }
 }

@@ -40,6 +40,7 @@ import org.trustedanalytics.auth.gateway.hbase.HBaseGateway;
 import org.trustedanalytics.auth.gateway.hbase.TestIntegrationApplication;
 import org.trustedanalytics.auth.gateway.hbase.integration.config.HBaseTestConfiguration;
 import org.trustedanalytics.auth.gateway.hbase.integration.config.HBaseTestingUtilityConfiguration;
+import org.trustedanalytics.auth.gateway.hbase.utils.Qualifiers;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
 import com.google.protobuf.BlockingRpcChannel;
@@ -47,7 +48,7 @@ import com.google.protobuf.ServiceException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @IntegrationTest("server.port=0")
-@ActiveProfiles({"test", "hbase-auth-gateway"})
+@ActiveProfiles({Qualifiers.TEST, Qualifiers.SIMPLE})
 @SpringApplicationConfiguration(classes = {TestIntegrationApplication.class,
     HBaseTestConfiguration.class, HBaseTestingUtilityConfiguration.class})
 public class HBaseGatewayIntegrationTest {

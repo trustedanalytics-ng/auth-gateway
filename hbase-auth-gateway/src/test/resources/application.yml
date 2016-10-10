@@ -1,3 +1,2 @@
 hbase:
-  provided:
-    zip: test-zip
+  configPath: ${hbase.config.path:}

@@ -13,16 +13,13 @@
  */
 package org.trustedanalytics.auth.gateway.engine;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.trustedanalytics.auth.gateway.state.State;
 import org.trustedanalytics.auth.gateway.zookeeper.ZookeeperClient;
-
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.junit.Assert.assertEquals;
 
 public class StateTest {
     public static final String VERSION = "None";

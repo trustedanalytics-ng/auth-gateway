@@ -13,11 +13,12 @@
  */
 package org.trustedanalytics.auth.gateway.engine.async;
 
-import lombok.Data;
+import java.util.Date;
+
 import org.springframework.http.HttpStatus;
 import org.trustedanalytics.auth.gateway.engine.AuthgatewayResponse;
 
-import java.util.Date;
+import lombok.Data;
 
 @Data
 public class AsyncState implements AuthgatewayResponse {

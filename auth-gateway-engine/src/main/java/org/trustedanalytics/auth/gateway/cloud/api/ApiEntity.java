@@ -14,16 +14,16 @@
 package org.trustedanalytics.auth.gateway.cloud.api;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ApiEntity {
 
-    private String name;
+  private String name;
 
-    public ApiEntity() {
-    }
+  public void setUsername(String username) {
+    this.name = username;
+  }
 
-    public void setUsername(String username) {
-        this.name = username;
-    }
 }

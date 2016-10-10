@@ -13,6 +13,15 @@
  */
 package org.trustedanalytics.auth.gateway.engine;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trustedanalytics.auth.gateway.cloud.Cloud;
@@ -23,249 +32,230 @@ import org.trustedanalytics.auth.gateway.spi.Authorizable;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 import org.trustedanalytics.auth.gateway.state.State;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 class Engine {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
-    private static final String CAN_NOT_FIND_ORGANIZATION = "Can not find organization: ";
+  private static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
+  private static final String CAN_NOT_FIND_ORGANIZATION = "Can not find organization: ";
 
-    private List<Authorizable> supportedAuthorizables;
-    private long timeoutInSeconds;
-    private Cloud cloud;
-    private State state;
+  private List<Authorizable> supportedAuthorizables;
+  private long timeoutInSeconds;
+  private Cloud cloud;
+  private State state;
 
 
-    public Engine(List<Authorizable> supportedAuthorizables, long timeoutInSeconds, Cloud cloud, State state) {
-        this.supportedAuthorizables = supportedAuthorizables;
-        this.timeoutInSeconds = timeoutInSeconds;
-        this.cloud = cloud;
-        this.state=state;
+  public Engine(List<Authorizable> supportedAuthorizables, long timeoutInSeconds, Cloud cloud,
+      State state) {
+    this.supportedAuthorizables = supportedAuthorizables;
+    this.timeoutInSeconds = timeoutInSeconds;
+    this.cloud = cloud;
+    this.state = state;
+  }
+
+  public PlatformState synchronize() throws AuthorizableGatewayException {
+    List<CompletableFuture<Void>> tasks = new LinkedList<>();
+    for (Authorizable authorizable : supportedAuthorizables) {
+      tasks.add(createFutureForMethod(authorizable::synchronize, authorizable.getName(),
+          "synchronizing cf"));
     }
 
-    public PlatformState synchronize() throws AuthorizableGatewayException {
-        List<CompletableFuture<Void>> tasks = new LinkedList<>();
-        for (Authorizable authorizable : supportedAuthorizables) {
-            tasks.add(createFutureForMethod(authorizable::synchronize, authorizable.getName(),
-                    "synchronizing cf"));
-        }
+    runTasks(tasks, "Error synchronizing cf");
 
-        runTasks(tasks, "Error synchronizing cf");
-
-        List<OrganizationState> organizations = cloud.getOrganizations();
-        for (OrganizationState organization : organizations) {
-            addOrganization(organization.getGuid());
-            organization.setSynchronizedState(state.getValidState(organization.getGuid()));
-            for (UserState user : organization.getUsers()) {
-                addUserToOrg(user.getGuid(), organization.getGuid());
-                user.setSynchronizedState(state.getValidState(organization.getGuid(), user.getGuid()));
-            }
-        }
-
-        LOGGER.info("Synchronize finished.");
-        return new PlatformState(organizations);
+    List<OrganizationState> organizations = cloud.getOrganizations();
+    for (OrganizationState organization : organizations) {
+      addOrganization(organization.getGuid());
+      organization.setSynchronizedState(state.getValidState(organization.getGuid()));
+      for (UserState user : organization.getUsers()) {
+        addUserToOrg(user.getGuid(), organization.getGuid());
+        user.setSynchronizedState(state.getValidState(organization.getGuid(), user.getGuid()));
+      }
     }
 
-    public OrganizationState synchronizeOrg(String orgId) throws AuthorizableGatewayException {
-        Optional<OrganizationState> organization = cloud.getOrganizations().stream()
-                .filter(org -> Objects.equals(org.getGuid(), orgId)).findAny();
+    LOGGER.info("Synchronize finished.");
+    return new PlatformState(organizations);
+  }
 
-        if (!organization.isPresent()) {
-            throw new AuthorizableGatewayException(CAN_NOT_FIND_ORGANIZATION + orgId);
-        }
+  public OrganizationState synchronizeOrg(String orgId) throws AuthorizableGatewayException {
+    Optional<OrganizationState> organization = cloud.getOrganizations().stream()
+        .filter(org -> Objects.equals(org.getGuid(), orgId)).findAny();
 
-        addOrganization(orgId);
-        organization.get().setSynchronizedState(state.getValidState(organization.get().getGuid()));
-        for (UserState user : organization.get().getUsers()) {
-            addUserToOrg(user.getGuid(), organization.get().getGuid());
-            user.setSynchronizedState(state.getValidState(organization.get().getGuid(), user.getGuid()));
-        }
-
-        LOGGER.info("Synchronize org " + orgId + " finished.");
-        return organization.get();
+    if (!organization.isPresent()) {
+      throw new AuthorizableGatewayException(CAN_NOT_FIND_ORGANIZATION + orgId);
     }
 
-    public UserState synchronizeUser(String orgId, String userId) throws AuthorizableGatewayException {
-
-        Optional<OrganizationState> organization = cloud.getOrganizations().stream()
-                .filter(org -> Objects.equals(org.getGuid(), orgId)).findAny();
-
-        if (!organization.isPresent()) {
-            throw new AuthorizableGatewayException(CAN_NOT_FIND_ORGANIZATION + orgId);
-        }
-
-        organization.get().setSynchronizedState(state.getValidState(organization.get().getGuid()));
-
-        if(!organization.get().isSynchronizedState()) {
-            throw new AuthorizableGatewayException("You can not synchronize user in not synchronized org " + orgId);
-        }
-
-        Optional<UserState> user = organization.get().getUsers().stream().
-                filter(user1 -> Objects.equals(user1.getGuid(), userId)).findAny();
-
-        if (!user.isPresent()) {
-            throw new AuthorizableGatewayException(String.format("Can not find user %s in organization %s",
-                    userId, orgId));
-        }
-
-        addUserToOrg(userId,orgId);
-        user.get().setSynchronizedState(state.getValidState(organization.get().getGuid(), user.get().getGuid()));
-
-        return user.get();
+    addOrganization(orgId);
+    organization.get().setSynchronizedState(state.getValidState(organization.get().getGuid()));
+    for (UserState user : organization.get().getUsers()) {
+      addUserToOrg(user.getGuid(), organization.get().getGuid());
+      user.setSynchronizedState(state.getValidState(organization.get().getGuid(), user.getGuid()));
     }
 
-    public PlatformState state() throws  AuthorizableGatewayException
-    {
-        List<OrganizationState> organizations = cloud.getOrganizations();
+    LOGGER.info("Synchronize org " + orgId + " finished.");
+    return organization.get();
+  }
 
-        for(OrganizationState organization:organizations)
-        {
-            organization.setSynchronizedState(state.getValidState(organization.getGuid()));
+  public UserState synchronizeUser(String orgId, String userId)
+      throws AuthorizableGatewayException {
 
-            for(UserState user : organization.getUsers()) {
-                user.setSynchronizedState(state.getValidState(organization.getGuid(), user.getGuid()));
-            }
-        }
+    Optional<OrganizationState> organization = cloud.getOrganizations().stream()
+        .filter(org -> Objects.equals(org.getGuid(), orgId)).findAny();
 
-        return new PlatformState(organizations);
+    if (!organization.isPresent()) {
+      throw new AuthorizableGatewayException(CAN_NOT_FIND_ORGANIZATION + orgId);
     }
 
-    public OrganizationState orgState(String orgId) throws  AuthorizableGatewayException
-    {
-        Optional<OrganizationState> organization = cloud.getOrganizations().stream()
-                .filter(org -> Objects.equals(org.getGuid(), orgId)).findAny();
+    organization.get().setSynchronizedState(state.getValidState(organization.get().getGuid()));
 
-        if (!organization.isPresent()) {
-            throw new AuthorizableGatewayException(CAN_NOT_FIND_ORGANIZATION + orgId);
-        }
-
-        organization.get().setSynchronizedState(state.getValidState(organization.get().getGuid()));
-
-        for(UserState user : organization.get().getUsers()) {
-            user.setSynchronizedState(state.getValidState(organization.get().getGuid(), user.getGuid()));
-        }
-
-        return organization.get();
+    if (!organization.get().isSynchronizedState()) {
+      throw new AuthorizableGatewayException(
+          "You can not synchronize user in not synchronized org " + orgId);
     }
 
-    public UserState userState(String orgId, String userId) throws  AuthorizableGatewayException
-    {
-        Optional<OrganizationState> organization = cloud.getOrganizations().stream()
-                .filter(org -> Objects.equals(org.getGuid(), orgId)).findAny();
+    Optional<UserState> user = organization.get().getUsers().stream()
+        .filter(user1 -> Objects.equals(user1.getGuid(), userId)).findAny();
 
-        if (!organization.isPresent()) {
-            throw new AuthorizableGatewayException(CAN_NOT_FIND_ORGANIZATION + orgId);
-        }
-
-        Optional<UserState> user = organization.get().getUsers().stream().
-                filter(user1 -> Objects.equals(user1.getGuid(), userId)).findAny();
-
-        if (!user.isPresent()) {
-            throw new AuthorizableGatewayException(String.format("Can not find user %s in organization %s",
-                    userId, orgId));
-        }
-        user.get().setSynchronizedState(state.getValidState(organization.get().getGuid(), user.get().getGuid()));
-
-        return user.get();
+    if (!user.isPresent()) {
+      throw new AuthorizableGatewayException(
+          String.format("Can not find user %s in organization %s", userId, orgId));
     }
 
-    public OrganizationState addOrganization(String orgId) throws AuthorizableGatewayException {
-        OrganizationState organizationState = orgState(orgId);
-        if(organizationState.isSynchronizedState()) {
-            LOGGER.info("Organization " + orgId + " is synchronized. Validating organization settings");
-        }
+    addUserToOrg(userId, orgId);
+    user.get().setSynchronizedState(
+        state.getValidState(organization.get().getGuid(), user.get().getGuid()));
 
-        List<CompletableFuture<Void>> tasks = new LinkedList<>();
-        for (Authorizable authorizable : supportedAuthorizables) {
-            tasks.add(createFutureForMethod(() -> authorizable.addOrganization(orgId),
-                    authorizable.getName(), "adding organization"));
-        }
+    return user.get();
+  }
 
-        runTasks(tasks, "Error adding organization");
-        state.setValidState(orgId);
+  public PlatformState state() throws AuthorizableGatewayException {
+    List<OrganizationState> organizations = cloud.getOrganizations();
 
-        return orgState(orgId);
+    for (OrganizationState organization : organizations) {
+      organization.setSynchronizedState(state.getValidState(organization.getGuid()));
+
+      for (UserState user : organization.getUsers()) {
+        user.setSynchronizedState(state.getValidState(organization.getGuid(), user.getGuid()));
+      }
     }
 
-    public UserState addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
-        UserState userState = userState(orgId, userId);
-        if(userState.isSynchronizedState()) {
-            LOGGER.info("User " + orgId + "is synchronized. Validating user settings");
-        }
+    return new PlatformState(organizations);
+  }
 
-        List<CompletableFuture<Void>> tasks = new LinkedList<>();
-        for (Authorizable authorizable : supportedAuthorizables) {
-            tasks.add(createFutureForMethod(() -> authorizable.addUserToOrg(userId, orgId),
-                    authorizable.getName(), "adding user to organization"));
-        }
+  public OrganizationState orgState(String orgId) throws AuthorizableGatewayException {
+    Optional<OrganizationState> organization = cloud.getOrganizations().stream()
+        .filter(org -> Objects.equals(org.getGuid(), orgId)).findAny();
 
-        runTasks(tasks, "Error adding user to organization");
-        state.setValidState(orgId, userId);
-
-        return userState(orgId, userId);
+    if (!organization.isPresent()) {
+      throw new AuthorizableGatewayException(CAN_NOT_FIND_ORGANIZATION + orgId);
     }
 
-    public void removeOrganization(String orgId) throws AuthorizableGatewayException {
-        List<CompletableFuture<Void>> tasks = new LinkedList<>();
-        for (Authorizable authorizable : supportedAuthorizables) {
-            tasks.add(createFutureForMethod(() -> authorizable.removeOrganization(orgId),
-                    authorizable.getName(), "removing organization"));
-        }
-        runTasks(tasks, "Error removing organization");
+    organization.get().setSynchronizedState(state.getValidState(organization.get().getGuid()));
 
-        state.unsetValidState(orgId);
+    for (UserState user : organization.get().getUsers()) {
+      user.setSynchronizedState(state.getValidState(organization.get().getGuid(), user.getGuid()));
     }
 
-    public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {
-        List<CompletableFuture<Void>> tasks = new LinkedList<>();
-        for (Authorizable authorizable : supportedAuthorizables) {
-            tasks.add(createFutureForMethod(() -> authorizable.removeUserFromOrg(userId, orgId),
-                    authorizable.getName(), "removing user from organization"));
-        }
+    return organization.get();
+  }
 
-        runTasks(tasks, "Error removing user from organization");
+  public UserState userState(String orgId, String userId) throws AuthorizableGatewayException {
+    Optional<OrganizationState> organization = cloud.getOrganizations().stream()
+        .filter(org -> Objects.equals(org.getGuid(), orgId)).findAny();
 
-        state.unsetValidState(orgId, userId);
+    if (!organization.isPresent()) {
+      throw new AuthorizableGatewayException(CAN_NOT_FIND_ORGANIZATION + orgId);
     }
 
-    private CompletableFuture<Void> createFutureForMethod(ThrowableAction consumer,
-                                                          String authorizableName, String authorizableOperation) {
+    Optional<UserState> user = organization.get().getUsers().stream()
+        .filter(user1 -> Objects.equals(user1.getGuid(), userId)).findAny();
 
-        return CompletableFuture.completedFuture(null).thenAcceptAsync(x -> {
-            try {
-                consumer.apply();
-                LOGGER.info(authorizableName + " finished " + authorizableOperation);
-            } catch (AuthorizableGatewayException e) {
-                throw new RuntimeException(authorizableName + " failed: " + e.getMessage(), e);
-            }
-        });
+    if (!user.isPresent()) {
+      throw new AuthorizableGatewayException(
+          String.format("Can not find user %s in organization %s", userId, orgId));
+    }
+    user.get().setSynchronizedState(
+        state.getValidState(organization.get().getGuid(), user.get().getGuid()));
+
+    return user.get();
+  }
+
+  public OrganizationState addOrganization(String orgId) throws AuthorizableGatewayException {
+    List<CompletableFuture<Void>> tasks = new LinkedList<>();
+    for (Authorizable authorizable : supportedAuthorizables) {
+      tasks.add(createFutureForMethod(() -> authorizable.addOrganization(orgId),
+          authorizable.getName(), "adding organization"));
     }
 
-    private synchronized void runTasks(List<CompletableFuture<Void>> tasks, String errorMessagePrefix)
-            throws AuthorizableGatewayException {
+    runTasks(tasks, "Error adding organization");
+    state.setValidState(orgId);
 
-        CompletableFuture<Void> allDone =
-                CompletableFuture.allOf(tasks.toArray(new CompletableFuture[tasks.size()]));
-        try {
-            allDone.get(timeoutInSeconds, TimeUnit.SECONDS);
-        } catch (ExecutionException e) {
-            LOGGER.error(errorMessagePrefix, e);
-            throw new AuthorizableGatewayException(errorMessagePrefix + " " + e.getMessage());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            LOGGER.error(errorMessagePrefix, e);
-            throw new AuthorizableGatewayException(errorMessagePrefix + " " + e.toString());
-        } catch (TimeoutException e) {
-            LOGGER.error(errorMessagePrefix, e);
-            throw new AuthorizableGatewayException(errorMessagePrefix + " " + e.toString());
-        }
+    return new OrganizationState(orgId, orgId);
+  }
+
+  public UserState addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
+    List<CompletableFuture<Void>> tasks = new LinkedList<>();
+    for (Authorizable authorizable : supportedAuthorizables) {
+      tasks.add(createFutureForMethod(() -> authorizable.addUserToOrg(userId, orgId),
+          authorizable.getName(), "adding user to organization"));
     }
 
+    runTasks(tasks, "Error adding user to organization");
+    state.setValidState(orgId, userId);
+
+    return new UserState(userId, userId);
+  }
+
+  public void removeOrganization(String orgId) throws AuthorizableGatewayException {
+    List<CompletableFuture<Void>> tasks = new LinkedList<>();
+    for (Authorizable authorizable : supportedAuthorizables) {
+      tasks.add(createFutureForMethod(() -> authorizable.removeOrganization(orgId),
+          authorizable.getName(), "removing organization"));
+    }
+    runTasks(tasks, "Error removing organization");
+
+    state.unsetValidState(orgId);
+  }
+
+  public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {
+    List<CompletableFuture<Void>> tasks = new LinkedList<>();
+    for (Authorizable authorizable : supportedAuthorizables) {
+      tasks.add(createFutureForMethod(() -> authorizable.removeUserFromOrg(userId, orgId),
+          authorizable.getName(), "removing user from organization"));
+    }
+
+    runTasks(tasks, "Error removing user from organization");
+
+    state.unsetValidState(orgId, userId);
+  }
+
+  private CompletableFuture<Void> createFutureForMethod(ThrowableAction consumer,
+      String authorizableName, String authorizableOperation) {
+
+    return CompletableFuture.completedFuture(null).thenAcceptAsync(x -> {
+      try {
+        consumer.apply();
+        LOGGER.info(authorizableName + " finished " + authorizableOperation);
+      } catch (AuthorizableGatewayException e) {
+        throw new RuntimeException(authorizableName + " failed: " + e.getMessage(), e);
+      }
+    });
+  }
+
+  private synchronized void runTasks(List<CompletableFuture<Void>> tasks, String errorMessagePrefix)
+      throws AuthorizableGatewayException {
+
+    CompletableFuture<Void> allDone =
+        CompletableFuture.allOf(tasks.toArray(new CompletableFuture[tasks.size()]));
+    try {
+      allDone.get(timeoutInSeconds, TimeUnit.SECONDS);
+    } catch (ExecutionException e) {
+      LOGGER.error(errorMessagePrefix, e);
+      throw new AuthorizableGatewayException(errorMessagePrefix + " " + e.getMessage());
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      LOGGER.error(errorMessagePrefix, e);
+      throw new AuthorizableGatewayException(errorMessagePrefix + " " + e.toString());
+    } catch (TimeoutException e) {
+      LOGGER.error(errorMessagePrefix, e);
+      throw new AuthorizableGatewayException(errorMessagePrefix + " " + e.toString());
+    }
+  }
 }

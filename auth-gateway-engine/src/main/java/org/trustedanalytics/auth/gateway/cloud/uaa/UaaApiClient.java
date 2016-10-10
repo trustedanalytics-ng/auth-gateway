@@ -13,13 +13,13 @@
  */
 package org.trustedanalytics.auth.gateway.cloud.uaa;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import feign.Feign;
 import feign.auth.BasicAuthRequestInterceptor;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class UaaApiClient implements UaaApi {
 

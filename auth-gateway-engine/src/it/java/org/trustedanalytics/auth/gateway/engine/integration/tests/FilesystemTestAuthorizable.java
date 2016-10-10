@@ -13,14 +13,14 @@
  */
 package org.trustedanalytics.auth.gateway.engine.integration.tests;
 
-import org.trustedanalytics.auth.gateway.spi.Authorizable;
-import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
-import org.trustedanalytics.auth.gateway.state.State;
-
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import org.trustedanalytics.auth.gateway.spi.Authorizable;
+import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
+import org.trustedanalytics.auth.gateway.state.State;
 
 /*
  * Authorizable that operates on filesystem made for testing purposes.
@@ -35,8 +35,7 @@ public class FilesystemTestAuthorizable implements Authorizable {
 
   private State state;
 
-  public FilesystemTestAuthorizable(State state)
-  {
+  public FilesystemTestAuthorizable(State state) {
     this.state = state;
   }
 

@@ -20,7 +20,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import com.github.rholder.retry.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
@@ -36,11 +35,13 @@ import org.springframework.web.client.RestTemplate;
 import org.trustedanalytics.auth.gateway.yarn.cloudera.client.api.ApiEndpoints;
 import org.trustedanalytics.auth.gateway.yarn.cloudera.client.api.entity.*;
 import org.trustedanalytics.auth.gateway.yarn.cloudera.config.ClouderaConfiguration;
+import org.trustedanalytics.auth.gateway.yarn.utils.Qualifiers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.rholder.retry.*;
 import com.google.common.base.Predicates;
 
-@Profile("yarn-auth-gateway")
+@Profile(Qualifiers.YARN)
 @Configuration
 public class ApiConnection {
 

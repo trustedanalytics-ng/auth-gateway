@@ -13,22 +13,23 @@
  */
 package org.trustedanalytics.auth.gateway.cloud;
 
-import feign.RequestInterceptor;
-import feign.RequestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.trustedanalytics.auth.gateway.cloud.uaa.UaaApi;
 
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
+
 @Configuration
 public class OAuth2RequestInterceptor implements RequestInterceptor {
 
-    @Autowired
-    private UaaApi uaaApi;
+  @Autowired
+  private UaaApi uaaApi;
 
-    public OAuth2RequestInterceptor() { }
+  public OAuth2RequestInterceptor() {}
 
-    @Override
-    public void apply(RequestTemplate requestTemplate) {
-        requestTemplate.header("Authorization", "bearer " + uaaApi.authenticate().getAccessToken());
-    }
+  @Override
+  public void apply(RequestTemplate requestTemplate) {
+    requestTemplate.header("Authorization", "bearer " + uaaApi.authenticate().getAccessToken());
+  }
 }

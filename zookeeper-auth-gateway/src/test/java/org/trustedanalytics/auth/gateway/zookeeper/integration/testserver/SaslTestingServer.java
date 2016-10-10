@@ -14,10 +14,10 @@
 
 package org.trustedanalytics.auth.gateway.zookeeper.integration.testserver;
 
+import java.io.IOException;
+
 import org.apache.curator.test.InstanceSpec;
 import org.apache.curator.test.TestingZooKeeperServer;
-
-import java.io.IOException;
 
 public class SaslTestingServer {
 

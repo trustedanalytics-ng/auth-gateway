@@ -13,16 +13,17 @@
  */
 package org.trustedanalytics.auth.gateway.cloud;
 
+import org.trustedanalytics.auth.gateway.cloud.api.ApiResponse;
+
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import org.trustedanalytics.auth.gateway.cloud.api.ApiResponse;
 
 @Headers("Content-Type: application/json")
 public interface CloudApi {
-    @RequestLine("GET /v2/organizations?results-per-page=100&page={page}")
-    ApiResponse getOrganizations(@Param("page") int page);
+  @RequestLine("GET /v2/organizations?results-per-page=100&page={page}")
+  ApiResponse getOrganizations(@Param("page") int page);
 
-    @RequestLine("GET /v2/organizations/{org}/users?results-per-page=100&page={page}")
-    ApiResponse getOrganizationUsers(@Param("org") String id, @Param("page") int page);
+  @RequestLine("GET /v2/organizations/{org}/users?results-per-page=100&page={page}")
+  ApiResponse getOrganizationUsers(@Param("org") String id, @Param("page") int page);
 }

@@ -14,13 +14,13 @@
 package org.trustedanalytics.auth.gateway.cloud.api;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ApiResources {
-    private ApiMetadata metadata;
+  private ApiMetadata metadata;
 
-    private ApiEntity entity;
+  private ApiEntity entity;
 
-    public ApiResources() {
-    }
 }

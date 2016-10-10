@@ -14,12 +14,12 @@
 package org.trustedanalytics.auth.gateway.cloud.api;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class ApiMetadata {
 
-    private String guid;
+  private String guid;
 
-    public ApiMetadata() {
-    }
 }

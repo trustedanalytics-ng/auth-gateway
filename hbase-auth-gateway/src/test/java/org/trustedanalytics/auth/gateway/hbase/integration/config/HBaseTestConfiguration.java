@@ -20,12 +20,14 @@ import java.net.URISyntaxException;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.client.Connection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 import org.trustedanalytics.auth.gateway.hbase.kerberos.KerberosHbaseProperties;
+import org.trustedanalytics.auth.gateway.hbase.utils.Qualifiers;
 
-@ActiveProfiles("test")
+@ActiveProfiles(Qualifiers.TEST)
 @Configuration
 public class HBaseTestConfiguration {
 
@@ -38,6 +40,7 @@ public class HBaseTestConfiguration {
   }
 
   @Bean
+  @Qualifier("test")
   public Connection getHBaseConnection()
       throws IOException, InterruptedException, URISyntaxException {
     return utility.getConnection();

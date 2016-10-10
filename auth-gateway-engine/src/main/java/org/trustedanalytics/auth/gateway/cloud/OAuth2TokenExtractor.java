@@ -13,12 +13,12 @@
  */
 package org.trustedanalytics.auth.gateway.cloud;
 
+import java.util.function.Supplier;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
-
-import java.util.function.Supplier;
 
 @Configuration
 public class OAuth2TokenExtractor implements Supplier<String> {

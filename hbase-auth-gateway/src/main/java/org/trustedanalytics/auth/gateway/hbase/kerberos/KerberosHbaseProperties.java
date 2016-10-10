@@ -20,26 +20,26 @@ import com.google.common.collect.ImmutableMap;
 
 public final class KerberosHbaseProperties {
 
-    private final String kdc;
-    private final String realm;
-    private final Map<String, Object> credentials;
+  private final String kdc;
+  private final String realm;
+  private final Map<String, Object> credentials;
 
-    public KerberosHbaseProperties(String kdc, String realm) {
-        this.kdc = kdc;
-        this.realm = realm;
+  public KerberosHbaseProperties(String kdc, String realm) {
+    this.kdc = kdc;
+    this.realm = realm;
 
-        this.credentials = ImmutableMap.of("kdc", kdc, "krealm", realm);
-    }
+    this.credentials = ImmutableMap.of("kdc", kdc, "krealm", realm);
+  }
 
-    public String getKdc() {
-        return this.kdc;
-    }
+  public String getKdc() {
+    return this.kdc;
+  }
 
-    public String getRealm() {
-        return this.realm;
-    }
+  public String getRealm() {
+    return this.realm;
+  }
 
-    public Map<String, Object> getCredentials() {
-        return this.credentials;
-    }
+  public Map<String, Object> getCredentials() {
+    return this.credentials;
+  }
 }

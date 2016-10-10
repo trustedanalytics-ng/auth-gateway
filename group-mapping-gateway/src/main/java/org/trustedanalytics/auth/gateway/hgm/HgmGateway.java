@@ -35,7 +35,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 @Configuration
-@Profile({Qualifiers.HTTPS, Qualifiers.KERBEROS})
+@Profile({Qualifiers.SIMPLE, Qualifiers.KERBEROS})
 public class HgmGateway implements Authorizable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HgmGateway.class);

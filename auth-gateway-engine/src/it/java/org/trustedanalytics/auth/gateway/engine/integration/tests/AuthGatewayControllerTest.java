@@ -13,9 +13,20 @@
  */
 package org.trustedanalytics.auth.gateway.engine.integration.tests;
 
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.WaitStrategies;
+import static org.junit.Assert.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,35 +50,36 @@ import org.trustedanalytics.auth.gateway.engine.WebSecurityConfig;
 import org.trustedanalytics.auth.gateway.state.State;
 import org.trustedanalytics.auth.gateway.zookeeper.ZookeeperClient;
 
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.WaitStrategies;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {Application.class,
-        TestConfiguration.class,
-        WebSecurityConfig.class,
-        OAuth2Helper.class,
-        AuthorizationServerConfig.class,
-        CloudConfig.class})
+@SpringApplicationConfiguration(
+    classes = {Application.class, TestConfiguration.class, WebSecurityConfig.class,
+        OAuth2Helper.class, AuthorizationServerConfig.class, CloudConfig.class})
 @WebAppConfiguration
 @IntegrationTest("server.port:0")
 @ActiveProfiles("test")
 public class AuthGatewayControllerTest {
+
+  public static final String USER_ID = "666";
+  
+  public static final String USER1_ID = "666666";
+
+  public static final String ORG_ID = "897351";
+
+  public static final String ORG1_ID = "897351345";
+
+  public static final String ORG_NAME = "alkheaefg";
+
+  public static final String ORG1_NAME = "alkheaefggfdgdf";
+
+  protected static final String ADMIN_NAME = "helmut";
+
+  protected static final String ORG_MANAGER_NAME = "jojo";
+
+  private static final String SYSTEM_TEMP = System.getProperty("java.io.tmpdir");
 
   @Autowired
   private WebApplicationContext context;
@@ -93,23 +105,14 @@ public class AuthGatewayControllerTest {
 
   private MockMvc mvc;
 
-  public static final String USER_ID = "666";
-  public static final String USER1_ID = "666666";
-  protected static final String ADMIN_NAME = "helmut";
-  protected static final String ORG_MANAGER_NAME = "jojo";
-
-  public static final String ORG_ID = "897351";
-  public static final String ORG1_ID = "897351345";
-  public static final String ORG_NAME = "alkheaefg";
-  public static final String ORG1_NAME = "alkheaefggfdgdf";
-  private static final String SYSTEM_TEMP = System.getProperty("java.io.tmpdir");
-
   @Before
   public void setUp() throws Exception {
-    mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).alwaysDo(print()).build();
+    mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).alwaysDo(print())
+        .build();
     jwtToken.setVerifierKey(publicKey);
     jwtToken.afterPropertiesSet();
-    Map<String, JwtAccessTokenConverter> beans = context.getBeansOfType(JwtAccessTokenConverter.class);
+    Map<String, JwtAccessTokenConverter> beans =
+        context.getBeansOfType(JwtAccessTokenConverter.class);
     beans.keySet();
 
     Path orgDir = FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID);
@@ -130,8 +133,7 @@ public class AuthGatewayControllerTest {
   //@Test
   public void doSome() throws Exception {
     mvc.perform(put("/organizations/" + ORG_ID + "/users/" + USER_ID)
-            .with(helper.bearerToken(ORG_MANAGER_NAME))
-    ).andExpect(status().isOk());
+        .with(helper.bearerToken(ORG_MANAGER_NAME))).andExpect(status().isOk());
 
     assertTrue(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, USER_ID)));
   }
@@ -139,8 +141,7 @@ public class AuthGatewayControllerTest {
   @Test
   public void addOrganizations_shouldReturn200AndCreateDir() throws Exception {
     mvc.perform(put("/organizations/" + ORG_ID + "?orgName=" + ORG_NAME)
-            .with(helper.bearerToken(ADMIN_NAME))
-    ).andExpect(status().isOk());
+        .with(helper.bearerToken(ADMIN_NAME))).andExpect(status().isOk());
 
     assertTrue(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
     assertTrue(Files.isDirectory(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
@@ -169,8 +170,7 @@ public class AuthGatewayControllerTest {
   @Test
   public void addOrganizations_shouldReturn200AndCreateDir_createSecondOrg() throws Exception {
     mvc.perform(put("/organizations/" + ORG_ID + "?orgName=" + ORG_NAME)
-            .with(helper.bearerToken(ADMIN_NAME))
-    ).andExpect(status().isOk());
+        .with(helper.bearerToken(ADMIN_NAME))).andExpect(status().isOk());
 
     assertTrue(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
     assertTrue(Files.isDirectory(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
@@ -182,8 +182,7 @@ public class AuthGatewayControllerTest {
     assertTrue(!state.getValidState(ORG1_ID));
 
     mvc.perform(put("/organizations/" + ORG1_ID + "?orgName=" + ORG1_NAME)
-            .with(helper.bearerToken(ADMIN_NAME))
-    ).andExpect(status().isOk());
+        .with(helper.bearerToken(ADMIN_NAME))).andExpect(status().isOk());
 
     assertTrue(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
     assertTrue(Files.isDirectory(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
@@ -196,7 +195,8 @@ public class AuthGatewayControllerTest {
   }
 
   @Test
-  public void addOrganizations_shouldReturn200AndCreateDir_createSecondOrg_async() throws Exception {
+  public void addOrganizations_shouldReturn200AndCreateDir_createSecondOrg_async()
+      throws Exception {
     makeAsyncRequest(put("/organizations/" + ORG_ID + "?orgName=" + ORG_NAME + "&async=true"), 200);
 
     assertTrue(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
@@ -208,7 +208,8 @@ public class AuthGatewayControllerTest {
     assertTrue(state.getValidState(ORG_ID));
     assertTrue(!state.getValidState(ORG1_ID));
 
-    makeAsyncRequest(put("/organizations/" + ORG1_ID + "?orgName=" + ORG1_NAME + "&async=true"), 200);
+    makeAsyncRequest(put("/organizations/" + ORG1_ID + "?orgName=" + ORG1_NAME + "&async=true"),
+        200);
 
     assertTrue(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
     assertTrue(Files.isDirectory(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
@@ -222,9 +223,9 @@ public class AuthGatewayControllerTest {
 
   @Test
   public void addUserToOrg_shouldReturn200AndCreateFileInOrgDir() throws Exception {
-    mvc.perform(put("/organizations/" + ORG_ID + "/users/" + USER_ID)
-            .with(helper.bearerToken(ADMIN_NAME))
-    ).andExpect(status().isOk());
+    mvc.perform(
+        put("/organizations/" + ORG_ID + "/users/" + USER_ID).with(helper.bearerToken(ADMIN_NAME)))
+        .andExpect(status().isOk());
 
     assertTrue(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID, USER_ID)));
   }
@@ -239,14 +240,12 @@ public class AuthGatewayControllerTest {
   @Test
   public void removeOrganization_shouldReturn200AndDeleteOrgDir() throws Exception {
     mvc.perform(put("/organizations/" + ORG_ID + "?orgName=" + ORG_NAME)
-            .with(helper.bearerToken(ADMIN_NAME))
-    ).andExpect(status().isOk());
+        .with(helper.bearerToken(ADMIN_NAME))).andExpect(status().isOk());
 
     assertTrue(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
 
     mvc.perform(delete("/organizations/" + ORG_ID + "?orgName=" + ORG_NAME)
-            .with(helper.bearerToken(ADMIN_NAME))
-    ).andExpect(status().isOk());
+        .with(helper.bearerToken(ADMIN_NAME))).andExpect(status().isOk());
 
     assertFalse(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
   }
@@ -257,22 +256,22 @@ public class AuthGatewayControllerTest {
 
     assertTrue(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
 
-    makeAsyncRequest(delete("/organizations/" + ORG_ID + "?orgName=" + ORG_NAME + "&async=true"), 200);
+    makeAsyncRequest(delete("/organizations/" + ORG_ID + "?orgName=" + ORG_NAME + "&async=true"),
+        200);
 
     assertFalse(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID)));
   }
 
   @Test
   public void removeUserFromOrg_shouldReturn200AndDeleteFileInOrgDir() throws Exception {
-    mvc.perform(put("/organizations/" + ORG_ID + "/users/" + USER_ID)
-            .with(helper.bearerToken(ADMIN_NAME))
-    ).andExpect(status().isOk());
+    mvc.perform(
+        put("/organizations/" + ORG_ID + "/users/" + USER_ID).with(helper.bearerToken(ADMIN_NAME)))
+        .andExpect(status().isOk());
 
     assertTrue(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID, USER_ID)));
 
     mvc.perform(delete("/organizations/" + ORG_ID + "/users/" + USER_ID)
-            .with(helper.bearerToken(ADMIN_NAME))
-    ).andExpect(status().isOk());
+        .with(helper.bearerToken(ADMIN_NAME))).andExpect(status().isOk());
 
     assertFalse(Files.exists(FileSystems.getDefault().getPath(SYSTEM_TEMP, ORG_ID, USER_ID)));
   }
@@ -290,20 +289,24 @@ public class AuthGatewayControllerTest {
 
   @Test
   public void asyncEndpoint_shouldNoContentWhenNotFoundJob() throws Exception {
-    mvc.perform(get("/jobs/" + UUID.randomUUID()).with(helper.bearerToken(ADMIN_NAME))).andExpect(status().isNoContent());
+    mvc.perform(get("/jobs/" + UUID.randomUUID()).with(helper.bearerToken(ADMIN_NAME)))
+        .andExpect(status().isNoContent());
   }
 
-  private void makeAsyncRequest(MockHttpServletRequestBuilder builder, int expectedStatus) throws Exception {
-    MvcResult result = mvc.perform(builder.with(helper.bearerToken(ADMIN_NAME))).andExpect(status().is(202))
-            .andReturn();
+  private void makeAsyncRequest(MockHttpServletRequestBuilder builder, int expectedStatus)
+      throws Exception {
+    MvcResult result = mvc.perform(builder.with(helper.bearerToken(ADMIN_NAME)))
+        .andExpect(status().is(202)).andReturn();
 
-    Retryer<Integer> requestRetryer = RetryerBuilder.<Integer>newBuilder().retryIfResult((e) -> e == 202)
+    Retryer<Integer> requestRetryer =
+        RetryerBuilder.<Integer>newBuilder().retryIfResult((e) -> e == 202)
             .withWaitStrategy(WaitStrategies.fixedWait(400, TimeUnit.MILLISECONDS)).build();
 
     JSONObject data = new JSONObject(result.getResponse().getContentAsString());
     MockHttpServletRequestBuilder asyncRequest = get(data.get("requestUrl").toString());
 
-    int responseCode = requestRetryer.call(() -> mvc.perform(asyncRequest.with(helper.bearerToken(ADMIN_NAME)))
+    int responseCode =
+        requestRetryer.call(() -> mvc.perform(asyncRequest.with(helper.bearerToken(ADMIN_NAME)))
             .andReturn().getResponse().getStatus());
 
     assertEquals(responseCode, expectedStatus);

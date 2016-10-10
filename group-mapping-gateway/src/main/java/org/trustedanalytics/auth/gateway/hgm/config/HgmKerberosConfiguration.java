@@ -13,16 +13,15 @@
  */
 package org.trustedanalytics.auth.gateway.hgm.config;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.kerberos.client.KerberosRestTemplate;
 import org.springframework.web.client.RestTemplate;
-import org.trustedanalytics.auth.gateway.KeyTab;
 import org.trustedanalytics.auth.gateway.hgm.utils.Qualifiers;
-
-import java.io.IOException;
 
 @Configuration
 @Profile(Qualifiers.KERBEROS)
@@ -31,12 +30,11 @@ public class HgmKerberosConfiguration {
   @Value("${group.mapping.kerberos.principal}")
   private String principal;
 
-  @Value("${group.mapping.kerberos.principalKeyTab}")
-  private String principalKeyTab;
+  @Value("${group.mapping.kerberos.keytabPath}")
+  private String keytabPath;
 
   @Bean(name = "hgmRestTemplate")
   public RestTemplate getHgmKerberosRestClient() throws IOException {
-    return new KerberosRestTemplate(
-        KeyTab.createInstance(principalKeyTab, principal).getFullKeyTabFilePath(), principal);
+    return new KerberosRestTemplate(keytabPath, principal);
   }
 }

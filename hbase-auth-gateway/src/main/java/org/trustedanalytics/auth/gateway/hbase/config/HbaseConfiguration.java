@@ -30,71 +30,64 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.trustedanalytics.auth.gateway.SystemEnvironment;
 import org.trustedanalytics.auth.gateway.hbase.kerberos.KerberosHbaseProperties;
-import org.trustedanalytics.cfbroker.config.HadoopZipConfiguration;
+import org.trustedanalytics.auth.gateway.hbase.utils.Qualifiers;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManager;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManagerFactory;
+import sun.security.krb5.KrbException;
 
-@Profile("hbase-auth-gateway")
+@Profile(Qualifiers.TEST_EXCLUDE)
 @org.springframework.context.annotation.Configuration
 public class HbaseConfiguration {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HbaseConfiguration.class);
 
-  private static final String AUTHENTICATION_METHOD = "kerberos";
-
-  private static final String AUTHENTICATION_METHOD_PROPERTY = "hbase.security.authentication";
-
   @Autowired
   private KerberosHbaseProperties kerberosHbaseProperties;
 
-  @Value("${hbase.provided.zip}")
-  private String hbaseProvidedZip;
+  @Autowired
+  @Qualifier(Qualifiers.CONFIGURATION)
+  private Configuration hbaseConfiguration;
 
+  @Profile(Qualifiers.SIMPLE)
   @Bean(destroyMethod = "close")
-  public Connection getHBaseConnection() throws InterruptedException, URISyntaxException,
-      LoginException, IOException {
-
-    Configuration hbaseConfiguration =
-        HadoopZipConfiguration.createHadoopZipConfiguration(hbaseProvidedZip)
-            .getAsHadoopConfiguration();
-
-    if (AUTHENTICATION_METHOD.equals(hbaseConfiguration.get(AUTHENTICATION_METHOD_PROPERTY))) {
-      LOGGER.info("Creating hbase client with kerberos support");
-      return getSecuredHBaseClient(hbaseConfiguration);
-    } else {
-      LOGGER.info("Creating hbase client without kerberos support");
-      return getUnsecuredHBaseClient(hbaseConfiguration);
-    }
+  public Connection getInsecureHbaseConnection()
+      throws InterruptedException, URISyntaxException, LoginException, IOException {
+    LOGGER.info("Creating hbase client without kerberos support");
+    return getInsecuredHBaseClient(hbaseConfiguration);
   }
 
-  private Connection getUnsecuredHBaseClient(Configuration hbaseConf) throws InterruptedException,
-      URISyntaxException, LoginException, IOException {
+  @Profile(Qualifiers.KERBEROS)
+  @Bean(destroyMethod = "close")
+  public Connection getSecureHBaseConnection()
+      throws InterruptedException, URISyntaxException, LoginException, IOException, KrbException {
+    LOGGER.info("Creating hbase client with kerberos support");
+    return getSecuredHBaseClient(hbaseConfiguration);
+  }
+
+  private Connection getInsecuredHBaseClient(Configuration hbaseConf)
+      throws InterruptedException, URISyntaxException, LoginException, IOException {
     SystemEnvironment systemEnvironment = new SystemEnvironment();
     Configuration conf = HBaseConfiguration.create(hbaseConf);
-    User user =
-        UserProvider.instantiate(hbaseConf).create(
-            UserGroupInformation.createRemoteUser(systemEnvironment
-                .getVariable(SystemEnvironment.KRB_USER)));
+    User user = UserProvider.instantiate(hbaseConf).create(UserGroupInformation
+        .createRemoteUser(systemEnvironment.getVariable(SystemEnvironment.KRB_USER)));
     return ConnectionFactory.createConnection(conf, user);
   }
 
-  private Connection getSecuredHBaseClient(Configuration hbaseConf) throws InterruptedException,
-      URISyntaxException, LoginException, IOException {
+  private Connection getSecuredHBaseClient(Configuration hbaseConf)
+      throws InterruptedException, URISyntaxException, LoginException, IOException, KrbException {
     LOGGER.info("Trying kerberos authentication");
-    KrbLoginManager loginManager =
-        KrbLoginManagerFactory.getInstance().getKrbLoginManagerInstance(
-            kerberosHbaseProperties.getKdc(), kerberosHbaseProperties.getRealm());
+    KrbLoginManager loginManager = KrbLoginManagerFactory.getInstance().getKrbLoginManagerInstance(
+        kerberosHbaseProperties.getKdc(), kerberosHbaseProperties.getRealm());
 
     SystemEnvironment systemEnvironment = new SystemEnvironment();
     Subject subject =
-        loginManager.loginWithCredentials(
-            systemEnvironment.getVariable(SystemEnvironment.KRB_USER), systemEnvironment
-                .getVariable(SystemEnvironment.KRB_PASSWORD).toCharArray());
+        loginManager.loginWithKeyTab(systemEnvironment.getVariable(SystemEnvironment.KRB_USER),
+            systemEnvironment.getVariable(SystemEnvironment.KRB_KEYTAB));
     loginManager.loginInHadoop(subject, hbaseConf);
     Configuration conf = HBaseConfiguration.create(hbaseConf);
     User user =

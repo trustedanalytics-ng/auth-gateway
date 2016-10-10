@@ -14,6 +14,9 @@
 
 package org.trustedanalytics.auth.gateway.zookeeper.integration;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
 import org.junit.After;
@@ -28,9 +31,6 @@ import org.trustedanalytics.auth.gateway.zookeeper.ZookeeperGateway;
 import org.trustedanalytics.auth.gateway.zookeeper.client.ZookeeperClient;
 import org.trustedanalytics.auth.gateway.zookeeper.client.ZookeeperPermission;
 import org.trustedanalytics.auth.gateway.zookeeper.integration.zkoperations.ZookeeperTestOperations;
-
-import java.util.Arrays;
-import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class IntegrationTestBase {

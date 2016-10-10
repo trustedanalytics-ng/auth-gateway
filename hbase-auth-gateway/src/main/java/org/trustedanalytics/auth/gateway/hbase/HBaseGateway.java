@@ -24,66 +24,68 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.trustedanalytics.auth.gateway.hbase.utils.Qualifiers;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
 import com.google.protobuf.ServiceException;
 
-@Profile("hbase-auth-gateway")
+@Profile({Qualifiers.SIMPLE, Qualifiers.KERBEROS})
 @Configuration
 public class HBaseGateway implements Authorizable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HBaseGateway.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(HBaseGateway.class);
 
-    @Autowired
-    private Connection connection;
+  @Autowired
+  private Connection connection;
 
-    @Override
-    public void addOrganization(String orgId) throws AuthorizableGatewayException {
-        HBaseClient hBaseClient = HBaseClient.getNewInstance(connection);
-        String namespaceName = orgId.replace("-", "");
-        try {
-            if(!hBaseClient.checkNamespaceExists(namespaceName))
-                hBaseClient.createNamespace(namespaceName);
+  @Override
+  public void addOrganization(String orgId) throws AuthorizableGatewayException {
+    HBaseClient hBaseClient = HBaseClient.getNewInstance(connection);
+    String namespaceName = orgId.replace("-", "");
+    try {
+      if (!hBaseClient.checkNamespaceExists(namespaceName))
+        hBaseClient.createNamespace(namespaceName);
 
-            String user = "@".concat(orgId);
-            hBaseClient.grandPremisionOnNamespace(user, namespaceName, Permission.Action.CREATE);
-        } catch (IOException | ServiceException e) {
-            throw new AuthorizableGatewayException(e.getMessage(), e);
-        }
+      String user = "@".concat(orgId);
+      hBaseClient.grandPremisionOnNamespace(user, namespaceName, Permission.Action.CREATE);
+    } catch (IOException | ServiceException e) {
+      throw new AuthorizableGatewayException(e.getMessage(), e);
     }
+  }
 
-    @Override
-    public void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
-        // no-operation
+  @Override
+  public void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
+    // no-operation
+  }
+
+  @Override
+  public void removeOrganization(String orgId) throws AuthorizableGatewayException {
+    HBaseClient hBaseClient = HBaseClient.getNewInstance(connection);
+    String namespaceName = orgId.replace("-", "");
+    try {
+      hBaseClient.removeNamespace(namespaceName);
+    } catch (NamespaceNotFoundException e) {
+      LOGGER.warn(
+          "Unable to delete namespace. Namespace named: " + namespaceName + " does not exist.");
+    } catch (IOException e) {
+      throw new AuthorizableGatewayException(e.getMessage(), e);
     }
+  }
 
-    @Override
-    public void removeOrganization(String orgId) throws AuthorizableGatewayException {
-        HBaseClient hBaseClient = HBaseClient.getNewInstance(connection);
-        String namespaceName = orgId.replace("-", "");
-        try {
-            hBaseClient.removeNamespace(namespaceName);
-        } catch (NamespaceNotFoundException e) {
-            LOGGER.warn("Unable to delete namespace. Namespace named: " + namespaceName + " does not exist.");
-        } catch (IOException e) {
-            throw new AuthorizableGatewayException(e.getMessage(), e);
-        }
-    }
+  @Override
+  public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {
+    // no-operation
+  }
 
-    @Override
-    public void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException {
-        // no-operation
-    }
+  @Override
+  public void synchronize() throws AuthorizableGatewayException {
+    // no-operation
+  }
 
-    @Override
-    public void synchronize() throws AuthorizableGatewayException {
-        // no-operation
-    }
-
-    @Override
-    public String getName() {
-        return "hbase";
-    }
-
+  @Override
+  public String getName() {
+    return "hbase";
+  }
 }
+

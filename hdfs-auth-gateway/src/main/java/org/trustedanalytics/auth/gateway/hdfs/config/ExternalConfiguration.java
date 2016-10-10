@@ -20,66 +20,43 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
 
-@Profile(Qualifiers.HDFS)
+import lombok.Getter;
+import lombok.Setter;
+
 @Configuration
 public class ExternalConfiguration {
 
-  @Value("${hdfs.clientKeytab}")
-  private String keytab;
+  @Value("${hdfs.keytabPath}")
+  @Getter @Setter
+  private String keytabPath;
 
   @Value("${hdfs.superUser}")
   @NotNull
+  @Getter @Setter
   private String superUser;
+
+  @Value("${hdfs.cfUser}")
+  @NotNull
+  @Getter @Setter
+  private String cfUser;
 
   @Value("${hdfs.hiveUser}")
   @NotNull
+  @Getter @Setter
   private String hiveUser;
 
   @Value("${hdfs.vcapUser}")
   @NotNull
+  @Getter @Setter
   private String vcapUser;
 
   @Value("${hdfs.arcadiaUser}")
   @NotNull
+  @Getter @Setter
   private String arcadiaUser;
 
-  public String getKeytab() {
-    return keytab;
-  }
-
-  public void setKeytab(String keytab) {
-    this.keytab = keytab;
-  }
-
-  public String getSuperUser() {
-    return superUser;
-  }
-
-  public void setSuperUser(String superUser) {
-    this.superUser = superUser;
-  }
-
-  public String getHiveUser() {
-    return hiveUser;
-  }
-
-  public void setHiveUser(String hiveUser) {
-    this.hiveUser = hiveUser;
-  }
-
-  public String getArcadiaUser() {
-    return arcadiaUser;
-  }
-
-  public void setArcadiaUser(String arcadiaUser) {
-    this.arcadiaUser = arcadiaUser;
-  }
-
-  public String getVcapUser() {
-    return vcapUser;
-  }
-
-  public void setVcapUser(String vcapUser) {
-    this.vcapUser = vcapUser;
-  }
+  @Value("${hdfs.configPath}")
+  @NotNull
+  @Getter @Setter
+  private String configPath;
 }

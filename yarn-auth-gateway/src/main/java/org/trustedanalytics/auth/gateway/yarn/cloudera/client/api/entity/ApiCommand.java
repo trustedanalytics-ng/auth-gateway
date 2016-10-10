@@ -13,11 +13,12 @@
  */
 package org.trustedanalytics.auth.gateway.yarn.cloudera.client.api.entity;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 
-import java.util.List;
+import lombok.Data;
 
 @Data
 public class ApiCommand {

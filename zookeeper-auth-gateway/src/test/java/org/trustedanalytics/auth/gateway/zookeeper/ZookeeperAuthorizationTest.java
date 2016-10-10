@@ -14,6 +14,11 @@
 
 package org.trustedanalytics.auth.gateway.zookeeper;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+
 import org.apache.zookeeper.KeeperException;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,11 +28,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 import org.trustedanalytics.auth.gateway.zookeeper.client.ZookeeperClient;
 import org.trustedanalytics.auth.gateway.zookeeper.client.ZookeeperPermission;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ZookeeperAuthorizationTest {

@@ -15,21 +15,21 @@ package org.trustedanalytics.auth.gateway.spi;
 
 public class AuthorizableGatewayException extends Exception {
 
-    private static final long serialVersionUID = 1388843226976069347L;
+  private static final long serialVersionUID = 1388843226976069347L;
 
-    /**
-     * @param message
-     * @param cause
-     */
-    public AuthorizableGatewayException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  /**
+   * @param message
+   * @param cause
+   */
+  public AuthorizableGatewayException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    /**
-     * @param message
-     */
-    public AuthorizableGatewayException(String message) {
-        super(message);
-    }
+  /**
+   * @param message
+   */
+  public AuthorizableGatewayException(String message) {
+    super(message);
+  }
 
 }

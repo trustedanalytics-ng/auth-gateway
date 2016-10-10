@@ -13,23 +13,19 @@
  */
 package org.trustedanalytics.auth.gateway;
 
-import java.io.IOException;
 import java.util.Optional;
 
-import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.trustedanalytics.cfbroker.config.HadoopZipConfiguration;
 
 public class SystemEnvironment {
 
   public static final String KRB_KDC = "KRB_KDC";
   public static final String KRB_REALM = "KRB_REALM";
   public static final String KRB_USER = "KRB_USER";
-  public static final String KRB_PASSWORD = "KRB_PASSWORD";
+  public static final String KRB_KEYTAB = "KRB_KEYTAB";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SystemEnvironment.class);
-  private static final String HADOOP_PROVIDED_ZIP = "HADOOP_PROVIDED_ZIP";
 
   public String getVariable(String varName) {
     return Optional.ofNullable(System.getenv(varName)).orElseGet(() -> {
@@ -37,12 +33,6 @@ public class SystemEnvironment {
       LOGGER.error(errorMsg);
       throw new NullPointerException(errorMsg);
     });
-  }
-
-  public Configuration getHadoopConfiguration() throws IOException {
-    String encodedZip = getVariable(HADOOP_PROVIDED_ZIP);
-    return HadoopZipConfiguration.createHadoopZipConfiguration(encodedZip)
-        .getAsHadoopConfiguration();
   }
 
   private static String getErrorMsg(String varName) {

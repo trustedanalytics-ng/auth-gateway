@@ -24,22 +24,19 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 @EnableResourceServer
 public class WebSecurityConfig extends ResourceServerConfigurerAdapter {
 
-    @Value("${spring.oauth2.resource.id}")
-    private String resourceId;
+  @Value("${spring.oauth2.resource.id}")
+  private String resourceId;
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
-        http
-                .exceptionHandling()
-                .accessDeniedHandler(new AdministratorAccessExceptionHandler())
-                .and()
-                .authorizeRequests()
-                .antMatchers("/users/**", "/organizations/**", "/synchronize**", "/state**", "/jobs/**")
-                .access("#oauth2.hasScope('cloud_controller.admin')");
-    }
+  @Override
+  public void configure(HttpSecurity http) throws Exception {
+    http.exceptionHandling().accessDeniedHandler(new AdministratorAccessExceptionHandler()).and()
+        .authorizeRequests()
+        .antMatchers("/users/**", "/organizations/**", "/synchronize**", "/state**", "/jobs/**")
+        .access(String.format("#oauth2.hasScope('%s.admin')", resourceId));
+  }
 
-    @Override
-    public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
-        resources.resourceId(resourceId);
-    }
+  @Override
+  public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+    resources.resourceId(resourceId);
+  }
 }

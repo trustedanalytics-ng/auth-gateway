@@ -14,12 +14,10 @@
 
 package org.trustedanalytics.auth.gateway.hbase;
 
-import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.doThrow;
 
 import java.io.IOException;
 
-import org.apache.hadoop.hbase.NamespaceExistException;
 import org.apache.hadoop.hbase.NamespaceNotFoundException;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.security.access.Permission;

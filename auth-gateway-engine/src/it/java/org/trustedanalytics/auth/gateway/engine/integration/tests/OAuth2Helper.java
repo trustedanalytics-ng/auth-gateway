@@ -13,6 +13,12 @@
  */
 package org.trustedanalytics.auth.gateway.engine.integration.tests;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,12 +32,6 @@ import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
-
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 
 @Component
 public class OAuth2Helper {
@@ -66,13 +66,12 @@ public class OAuth2Helper {
     Map<String, Serializable> extensionProperties = Collections.emptyMap();
 
     // Create request
-    OAuth2Request oAuth2Request =
-        new OAuth2Request(requestParameters, clientId, authorities, approved, scopes,
-                          resourceIds, redirectUrl, responseTypes, extensionProperties);
+    OAuth2Request oAuth2Request = new OAuth2Request(requestParameters, clientId, authorities,
+        approved, scopes, resourceIds, redirectUrl, responseTypes, extensionProperties);
     // Create OAuth2AccessToken
     User userPrincipal = new User("user", "", true, true, true, true, authorities);
-    UsernamePasswordAuthenticationToken
-        authenticationToken = new UsernamePasswordAuthenticationToken(userPrincipal, null, authorities);
+    UsernamePasswordAuthenticationToken authenticationToken =
+        new UsernamePasswordAuthenticationToken(userPrincipal, null, authorities);
     OAuth2Authentication auth = new OAuth2Authentication(oAuth2Request, authenticationToken);
     return tokenService.createAccessToken(auth);
   }

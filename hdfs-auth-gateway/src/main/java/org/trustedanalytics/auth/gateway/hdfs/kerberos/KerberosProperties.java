@@ -13,40 +13,24 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs.kerberos;
 
+import lombok.Data;
+
+@Data
 public class KerberosProperties {
 
   private final String kdc;
   private final String realm;
   private final String technicalPrincipal;
   private final String keytabPrincipal;
-  private final String keytab;
+  private final String keytabPath;
 
   public KerberosProperties(String kdc, String realm, String technicalUser, String keytabPrincipal,
-      String keytab) {
+      String keytabPath) {
     this.realm = realm;
     this.kdc = kdc;
     this.technicalPrincipal = technicalUser;
     this.keytabPrincipal = keytabPrincipal;
-    this.keytab = keytab;
+    this.keytabPath = keytabPath;
   }
 
-  public String getRealm() {
-    return realm;
-  }
-
-  public String getKdc() {
-    return kdc;
-  }
-
-  public String getTechnicalPrincipal() {
-    return technicalPrincipal;
-  }
-
-  public String getKeytabPrincipal() {
-    return keytabPrincipal;
-  }
-
-  public String getKeytab() {
-    return keytab;
-  }
 }

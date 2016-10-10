@@ -13,11 +13,13 @@
  */
 package org.trustedanalytics.auth.gateway.engine.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
+import java.util.List;
+
 import org.trustedanalytics.auth.gateway.engine.AuthgatewayResponse;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Getter;
 
 public class PlatformState implements AuthgatewayResponse {
   @Getter

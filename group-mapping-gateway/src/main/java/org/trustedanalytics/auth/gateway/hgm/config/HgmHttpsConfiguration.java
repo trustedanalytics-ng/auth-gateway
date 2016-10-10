@@ -38,7 +38,7 @@ import org.springframework.web.client.RestTemplate;
 import org.trustedanalytics.auth.gateway.hgm.utils.Qualifiers;
 
 @Configuration
-@Profile(Qualifiers.HTTPS)
+@Profile(Qualifiers.SIMPLE)
 public class HgmHttpsConfiguration {
 
   @Value("${group.mapping.https.username}")

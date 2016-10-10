@@ -22,6 +22,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.authentication.util.KerberosName;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.trustedanalytics.auth.gateway.configuration.Authenticator;
@@ -36,18 +37,23 @@ import sun.security.krb5.KrbException;
 @Profile(Qualifiers.KERBEROS)
 public class KrbAuthenticator implements Authenticator {
 
+  private static final String KRB_PRINC_TO_SYS_USER_NAME_RULES = "hadoop.security.auth_to_local";
+
   @Autowired
   private WarehouseKrbClientConfiguration conf;
 
+  @Autowired
+  @Qualifier(Qualifiers.CONFIGURATION)
+  private Configuration hiveConfiguration;
+
   @Override
   public UserGroupInformation getUserUGI() throws LoginException, IOException, KrbException {
+    KerberosName.setRules(hiveConfiguration.get(KRB_PRINC_TO_SYS_USER_NAME_RULES));
     KrbLoginManager loginManager = KrbLoginManagerFactory.getInstance()
         .getKrbLoginManagerInstance(conf.getKdc(), conf.getRealm());
     Subject subject =
         loginManager.loginWithKeyTab(conf.getSimpleConfig().getSuperUser(), conf.getKeyTabPath());
-    Configuration hadoopConf = new Configuration();
-    hadoopConf.set("hadoop.security.authentication", "kerberos");
-    loginManager.loginInHadoop(subject, hadoopConf);
+    loginManager.loginInHadoop(subject, hiveConfiguration);
     return loginManager.getUGI(subject);
   }
 

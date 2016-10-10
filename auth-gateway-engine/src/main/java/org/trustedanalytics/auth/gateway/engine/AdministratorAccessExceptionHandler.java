@@ -13,25 +13,29 @@
  */
 package org.trustedanalytics.auth.gateway.engine;
 
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.trustedanalytics.utils.errorhandling.ErrorLogger;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-
 public class AdministratorAccessExceptionHandler implements AccessDeniedHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AdministratorAccessExceptionHandler.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(AdministratorAccessExceptionHandler.class);
 
-    @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        ErrorLogger.logAndSendErrorResponse(LOGGER, response, FORBIDDEN, "This action requires administrator permissions", accessDeniedException);
-    }
+  @Override
+  public void handle(HttpServletRequest request, HttpServletResponse response,
+      AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    ErrorLogger.logAndSendErrorResponse(LOGGER, response, FORBIDDEN,
+        "This action requires administrator permissions", accessDeniedException);
+  }
 }

@@ -20,8 +20,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
+import org.trustedanalytics.auth.gateway.yarn.utils.Qualifiers;
 
-@Profile("yarn-auth-gateway")
+@Profile(Qualifiers.YARN)
 @Configuration
 public class YarnGateway implements Authorizable {
 

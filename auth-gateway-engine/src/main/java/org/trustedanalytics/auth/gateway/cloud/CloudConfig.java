@@ -13,30 +13,30 @@
  */
 package org.trustedanalytics.auth.gateway.cloud;
 
-import feign.Feign;
-import feign.jackson.JacksonDecoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import feign.Feign;
+import feign.jackson.JacksonDecoder;
+
 @Configuration
 @Profile("cloud")
 public class CloudConfig {
 
-    @Value("${cloud.api}")
-    private String cloudApiUri;
+  @Value("${cloud.api}")
+  private String cloudApiUri;
 
-    @Autowired
-    private OAuth2RequestInterceptor interceptor;
+  @Autowired
+  private OAuth2RequestInterceptor interceptor;
 
-    public CloudConfig() {
-    }
+  public CloudConfig() {}
 
-    @Bean
-    public Cloud getCloud() {
-        return new Cloud(Feign.builder().decoder(new JacksonDecoder()).requestInterceptor(interceptor)
-                .target(CloudApi.class, cloudApiUri));
-    }
+  @Bean
+  public Cloud getCloud() {
+    return new Cloud(Feign.builder().decoder(new JacksonDecoder()).requestInterceptor(interceptor)
+        .target(CloudApi.class, cloudApiUri));
+  }
 }

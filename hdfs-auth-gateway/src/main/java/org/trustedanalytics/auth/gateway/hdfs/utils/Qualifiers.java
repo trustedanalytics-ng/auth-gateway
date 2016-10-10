@@ -14,8 +14,12 @@
 package org.trustedanalytics.auth.gateway.hdfs.utils;
 
 public final class Qualifiers {
-  public static final String HDFS = "hdfs-auth-gateway";
+  public static final String SIMPLE = "hdfs-auth-gateway";
+  public static final String KERBEROS = "krb-hdfs-auth-gateway";
+  public static final String CONFIGURATION = "hdfs-configuration";
   public static final String TEST_EXCLUDE = "!test";
+  public static final String TEST = "test";
 
-  private Qualifiers() {}
+  private Qualifiers() {
+  }
 }

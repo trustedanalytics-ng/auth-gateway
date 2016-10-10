@@ -13,6 +13,12 @@
  */
 package org.trustedanalytics.auth.gateway.engine;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,15 +26,6 @@ import org.junit.runners.Parameterized;
 import org.trustedanalytics.auth.gateway.cloud.uaa.AccessTokenResponse;
 import org.trustedanalytics.auth.gateway.cloud.uaa.CachedUaaApiClient;
 import org.trustedanalytics.auth.gateway.cloud.uaa.UaaApi;
-
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
 
 @RunWith(Parameterized.class)
 public class TokenCacheTest {

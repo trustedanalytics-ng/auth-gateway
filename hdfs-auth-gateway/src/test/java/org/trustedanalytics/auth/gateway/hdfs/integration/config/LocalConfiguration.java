@@ -21,13 +21,15 @@ import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.hdfs.DFSConfigKeys;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
+import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
 
 @Configuration
-@Profile("test")
+@Profile(Qualifiers.TEST)
 public class LocalConfiguration {
 
   @Bean
@@ -36,6 +38,7 @@ public class LocalConfiguration {
   }
 
   @Bean
+  @Qualifier(Qualifiers.CONFIGURATION)
   public org.apache.hadoop.conf.Configuration initializeHdfsCluster() throws IOException,
       InterruptedException, URISyntaxException {
     File baseDir = new File("./target/hdfs/" + "testName").getAbsoluteFile();

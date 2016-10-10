@@ -17,7 +17,7 @@ import org.apache.hadoop.fs.Path;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-@Profile(Qualifiers.HDFS)
+@Profile({Qualifiers.SIMPLE, Qualifiers.KERBEROS})
 @Configuration
 public class PathCreator {
 

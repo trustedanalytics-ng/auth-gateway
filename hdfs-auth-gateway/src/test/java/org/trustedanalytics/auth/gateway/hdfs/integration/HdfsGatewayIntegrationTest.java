@@ -13,14 +13,17 @@
  */
 package org.trustedanalytics.auth.gateway.hdfs.integration;
 
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.AclEntry;
-import org.apache.hadoop.fs.permission.AclEntryScope;
-import org.apache.hadoop.fs.permission.AclEntryType;
-import org.apache.hadoop.fs.permission.AclStatus;
-import org.apache.hadoop.fs.permission.FsAction;
-import org.apache.hadoop.fs.permission.FsPermission;
+import org.apache.hadoop.fs.permission.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,20 +33,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.trustedanalytics.auth.gateway.hdfs.HdfsGateway;
 import org.trustedanalytics.auth.gateway.hdfs.TestIntegrationApplication;
-import org.trustedanalytics.auth.gateway.hdfs.config.FileSystemProvider;
+import org.trustedanalytics.auth.gateway.hdfs.fs.FileSystemProvider;
 import org.trustedanalytics.auth.gateway.hdfs.integration.config.LocalConfiguration;
+import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
-import java.io.IOException;
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ActiveProfiles({"test", "hdfs-auth-gateway"})
+@ActiveProfiles({Qualifiers.TEST, Qualifiers.SIMPLE})
 @SpringApplicationConfiguration(classes = {TestIntegrationApplication.class,
         LocalConfiguration.class})
 public class HdfsGatewayIntegrationTest {

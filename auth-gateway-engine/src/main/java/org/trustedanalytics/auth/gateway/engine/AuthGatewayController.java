@@ -13,28 +13,24 @@
  */
 package org.trustedanalytics.auth.gateway.engine;
 
-import io.swagger.annotations.ApiOperation;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.trustedanalytics.auth.gateway.engine.async.AsyncComponent;
 import org.trustedanalytics.auth.gateway.engine.async.AsyncRequestState;
 import org.trustedanalytics.auth.gateway.engine.async.NoContentException;
 import org.trustedanalytics.auth.gateway.engine.async.TaskNotFinishedException;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
-import java.util.UUID;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 class AuthGatewayController {
 
   private final Engine authGatewayEngine;
+
   private final AsyncComponent asyncComponent;
 
   @Autowired
@@ -43,29 +39,30 @@ class AuthGatewayController {
     this.asyncComponent = asyncComponent;
   }
 
-  @ApiOperation("Creating organization: in case of hdfs - creating directory, zookeeper - creating znode, " +
-          "sentry - roles on cdh cluster, hgm - usergroupmapping")
+  @ApiOperation("Creating organization: in case of hdfs - creating directory, zookeeper - creating znode, "
+      + "sentry - roles on cdh cluster, hgm - usergroupmapping")
   @RequestMapping(value = "/organizations/{orgId}", method = RequestMethod.PUT)
   public AuthgatewayResponse addOrganization(@PathVariable String orgId,
-                                @RequestParam(value = "async", defaultValue = "false") Boolean async)
-          throws AuthorizableGatewayException {
+      @RequestParam(value = "async", defaultValue = "false") Boolean async)
+      throws AuthorizableGatewayException {
     return callRequest(() -> authGatewayEngine.addOrganization(orgId), async);
   }
 
   @ApiOperation("Adding user's access to hadoop components in given organization")
   @RequestMapping(value = "/organizations/{orgId}/users/{userId}", method = RequestMethod.PUT)
-  public AuthgatewayResponse addUserToOrganization(@PathVariable String userId, @PathVariable String orgId,
-                                      @RequestParam(value = "async", defaultValue = "false") Boolean async)
-          throws AuthorizableGatewayException {
+  public AuthgatewayResponse addUserToOrganization(@PathVariable String userId,
+      @PathVariable String orgId,
+      @RequestParam(value = "async", defaultValue = "false") Boolean async)
+      throws AuthorizableGatewayException {
     return callRequest(() -> authGatewayEngine.addUserToOrg(userId, orgId), async);
   }
 
-  @ApiOperation("Removing organization: in case of hdfs - removing directory, zookeeper - removing znode, " +
-          "sentry - roles on cdh cluster, hgm - usergroupmapping")
+  @ApiOperation("Removing organization: in case of hdfs - removing directory, zookeeper - removing znode, "
+      + "sentry - roles on cdh cluster, hgm - usergroupmapping")
   @RequestMapping(value = "/organizations/{orgId}", method = RequestMethod.DELETE)
   public AuthgatewayResponse deleteOrganization(@PathVariable String orgId,
-                                   @RequestParam(value = "async", defaultValue = "false") Boolean async)
-          throws AuthorizableGatewayException {
+      @RequestParam(value = "async", defaultValue = "false") Boolean async)
+      throws AuthorizableGatewayException {
     return callRequest(() -> {
       authGatewayEngine.removeOrganization(orgId);
       return null;
@@ -74,9 +71,10 @@ class AuthGatewayController {
 
   @ApiOperation("Removing user's access to hadoop components in given organization")
   @RequestMapping(value = "/organizations/{orgId}/users/{userId}", method = RequestMethod.DELETE)
-  public AuthgatewayResponse deleteUserFromOrganization(@PathVariable String userId, @PathVariable String orgId,
-                                           @RequestParam(value = "async", defaultValue = "false") Boolean async)
-          throws AuthorizableGatewayException {
+  public AuthgatewayResponse deleteUserFromOrganization(@PathVariable String userId,
+      @PathVariable String orgId,
+      @RequestParam(value = "async", defaultValue = "false") Boolean async)
+      throws AuthorizableGatewayException {
     return callRequest(() -> {
       authGatewayEngine.removeUserFromOrg(userId, orgId);
       return null;
@@ -85,47 +83,51 @@ class AuthGatewayController {
 
   @ApiOperation("Synchronizing CF organizations and users with CDH")
   @RequestMapping(value = "/synchronize", method = RequestMethod.PUT)
-  public AuthgatewayResponse synchronize(@RequestParam(value = "async", defaultValue = "false") Boolean async)
-          throws AuthorizableGatewayException {
+  public AuthgatewayResponse synchronize(
+      @RequestParam(value = "async", defaultValue = "false") Boolean async)
+      throws AuthorizableGatewayException {
     return callRequest(authGatewayEngine::synchronize, async);
   }
 
   @ApiOperation("Synchronizing CF organization with CDH")
   @RequestMapping(value = "/synchronize/organizations/{orgId}", method = RequestMethod.PUT)
   public AuthgatewayResponse synchronizeOrg(@PathVariable String orgId,
-                               @RequestParam(value = "async", defaultValue = "false") Boolean async)
-          throws AuthorizableGatewayException {
+      @RequestParam(value = "async", defaultValue = "false") Boolean async)
+      throws AuthorizableGatewayException {
     return callRequest(() -> authGatewayEngine.synchronizeOrg(orgId), async);
   }
 
   @ApiOperation("Synchronizing CF user in organization with CDH")
-  @RequestMapping(value = "/synchronize/organizations/{orgId}/users/{userId}", method = RequestMethod.PUT)
-  public AuthgatewayResponse synchronizeUser(@PathVariable String orgId, @PathVariable String userId,
-                                @RequestParam(value = "async", defaultValue = "false") Boolean async)
-          throws AuthorizableGatewayException {
+  @RequestMapping(value = "/synchronize/organizations/{orgId}/users/{userId}",
+      method = RequestMethod.PUT)
+  public AuthgatewayResponse synchronizeUser(@PathVariable String orgId,
+      @PathVariable String userId,
+      @RequestParam(value = "async", defaultValue = "false") Boolean async)
+      throws AuthorizableGatewayException {
     return callRequest(() -> authGatewayEngine.synchronizeUser(orgId, userId), async);
   }
 
   @ApiOperation("Get all organizations state")
   @RequestMapping(value = "/state", method = RequestMethod.GET)
-  public AuthgatewayResponse state(@RequestParam(value = "async", defaultValue = "false") Boolean async)
-          throws AuthorizableGatewayException {
+  public AuthgatewayResponse state(
+      @RequestParam(value = "async", defaultValue = "false") Boolean async)
+      throws AuthorizableGatewayException {
     return callRequest(authGatewayEngine::state, async);
   }
 
   @ApiOperation("Get organization state")
   @RequestMapping(value = "/state/organizations/{orgId}", method = RequestMethod.GET)
   public AuthgatewayResponse state(@PathVariable String orgId,
-                      @RequestParam(value = "async", defaultValue = "false") Boolean async)
-          throws AuthorizableGatewayException {
+      @RequestParam(value = "async", defaultValue = "false") Boolean async)
+      throws AuthorizableGatewayException {
     return callRequest(() -> authGatewayEngine.orgState(orgId), async);
   }
 
   @ApiOperation("Get user state")
   @RequestMapping(value = "/state/organizations/{orgId}/users/{userId}", method = RequestMethod.GET)
   public AuthgatewayResponse state(@PathVariable String orgId, @PathVariable String userId,
-                      @RequestParam(value = "async", defaultValue = "false") Boolean async)
-          throws AuthorizableGatewayException {
+      @RequestParam(value = "async", defaultValue = "false") Boolean async)
+      throws AuthorizableGatewayException {
     return callRequest(() -> authGatewayEngine.userState(orgId, userId), async);
   }
 
@@ -143,13 +145,13 @@ class AuthGatewayController {
 
   @ExceptionHandler(NoContentException.class)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void parseNoContentState(NoContentException e) { }
+  public void parseNoContentState(NoContentException e) {}
 
-  private AuthgatewayResponse callRequest(RequestApplier request, Boolean async) throws AuthorizableGatewayException {
+  private AuthgatewayResponse callRequest(RequestApplier request, Boolean async)
+      throws AuthorizableGatewayException {
     if (!async) {
       return request.parseRequest();
-    }
-    else {
+    } else {
       return asyncComponent.addTask(request);
     }
   }

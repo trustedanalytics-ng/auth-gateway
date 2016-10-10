@@ -14,6 +14,10 @@
 
 package org.trustedanalytics.auth.gateway.zookeeper.config;
 
+import java.io.IOException;
+
+import javax.security.auth.login.LoginException;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,13 +28,9 @@ import org.trustedanalytics.auth.gateway.spi.Authorizable;
 import org.trustedanalytics.auth.gateway.zookeeper.ZookeeperGateway;
 import org.trustedanalytics.auth.gateway.zookeeper.client.KerberosfulZookeeperClient;
 import org.trustedanalytics.auth.gateway.zookeeper.client.KerberoslessZookeeperClient;
-import org.trustedanalytics.auth.gateway.zookeeper.client.ZookeeperClient;
-
-import javax.security.auth.login.LoginException;
-import java.io.IOException;
+import org.trustedanalytics.auth.gateway.zookeeper.utils.Qualifiers;
 
 @Configuration
-@Profile("zookeeper-auth-gateway")
 public class ZookeeperGatewayConfig {
 
   private static final String BASE_NODE = "/org";
@@ -38,22 +38,18 @@ public class ZookeeperGatewayConfig {
   @Autowired
   private CuratorFramework curatorFramework;
 
-  @Value("${kerberos.enabled}")
-  private boolean kerberos;
-
   @Value("${zookeeper.user}")
   private String username;
 
-  private ZookeeperClient getZookeeperClient()
-  {
-    if(kerberos)
-      return new KerberosfulZookeeperClient(curatorFramework, BASE_NODE);
-    else
-      return new KerberoslessZookeeperClient(curatorFramework, BASE_NODE);
+  @Bean
+  @Profile(Qualifiers.SIMPLE)
+  public Authorizable createInSecureZookeeperGateway() throws IOException, LoginException {
+    return new ZookeeperGateway(new KerberoslessZookeeperClient(curatorFramework, BASE_NODE), username);
   }
 
   @Bean
-  public Authorizable zookeeperGateway() throws IOException, LoginException {
-    return new ZookeeperGateway(getZookeeperClient(), username);
+  @Profile(Qualifiers.KERBEROS)
+  public Authorizable createSecureZookeeperGateway() throws IOException, LoginException {
+    return new ZookeeperGateway(new KerberosfulZookeeperClient(curatorFramework, BASE_NODE), username);
   }
 }

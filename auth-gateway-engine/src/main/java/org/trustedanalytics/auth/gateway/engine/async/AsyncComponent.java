@@ -13,24 +13,25 @@
  */
 package org.trustedanalytics.auth.gateway.engine.async;
 
-import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.trustedanalytics.auth.gateway.engine.RequestApplier;
-import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
-
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.trustedanalytics.auth.gateway.engine.RequestApplier;
+import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
+
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 public class AsyncComponent {
 

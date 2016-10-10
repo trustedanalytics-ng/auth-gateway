@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.trustedanalytics.auth.gateway.KeyTab;
 import org.trustedanalytics.auth.gateway.SystemEnvironment;
 import org.trustedanalytics.auth.gateway.configuration.simple.WarehouseClientConfiguration;
 import org.trustedanalytics.auth.gateway.utils.Qualifiers;
@@ -34,9 +33,7 @@ public class WarehouseKrbClientConfiguration {
 
   private String realm;
 
-  @Value("${warehouse.client.clientKeyTab}")
-  private String clientKeyTab;
-
+  @Value("${warehouse.client.keytabPath}")
   private String keyTabPath;
 
   @Autowired
@@ -47,8 +44,6 @@ public class WarehouseKrbClientConfiguration {
     SystemEnvironment systemEnvironment = new SystemEnvironment();
     kdc = systemEnvironment.getVariable(SystemEnvironment.KRB_KDC);
     realm = systemEnvironment.getVariable(SystemEnvironment.KRB_REALM);
-    keyTabPath =
-        KeyTab.createInstance(clientKeyTab, simpleConfig.getSuperUser()).getFullKeyTabFilePath();
   }
 
   public String getKdc() {

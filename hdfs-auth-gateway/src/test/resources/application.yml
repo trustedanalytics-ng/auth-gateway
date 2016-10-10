@@ -1,6 +1,8 @@
 hdfs:
-  clientKeytab: ${hdfs.keytab:}
+  keytabPath: ${hdfs.keytab.path:}
+  configPath: ${hdfs.config.path:}
   superUser: ${hdfs.superuser:super}
+  cfUser: cf
   hiveUser: hive
   arcadiaUser: test-arcadia
   vcapUser: test-vcap

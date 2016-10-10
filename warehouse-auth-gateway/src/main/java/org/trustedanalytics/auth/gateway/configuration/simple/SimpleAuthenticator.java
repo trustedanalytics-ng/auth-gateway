@@ -22,8 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.trustedanalytics.auth.gateway.configuration.Authenticator;
-
 import org.trustedanalytics.auth.gateway.utils.Qualifiers;
+
 import sun.security.krb5.KrbException;
 
 @Component

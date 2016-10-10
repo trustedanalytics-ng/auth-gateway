@@ -15,6 +15,8 @@
 
 package org.trustedanalytics.auth.gateway.zookeeper.integration;
 
+import java.io.IOException;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryOneTime;
@@ -24,8 +26,6 @@ import org.junit.BeforeClass;
 import org.trustedanalytics.auth.gateway.zookeeper.client.KerberoslessZookeeperClient;
 import org.trustedanalytics.auth.gateway.zookeeper.client.ZookeeperClient;
 import org.trustedanalytics.auth.gateway.zookeeper.integration.zkoperations.ZookeeperTestOperations;
-
-import java.io.IOException;
 
 public class WithoutSASLIntegrationTest extends IntegrationTestBase {
 

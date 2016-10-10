@@ -3,10 +3,10 @@ engine:
   asyncTimeout: 1000
   version: ${version:UNKNOWN}
 cloud:
-    api: ${vcap.services.sso.credentials.apiEndpoint}
-    clientId: ${vcap.services.sso.credentials.clientId}
-    clientPassword: ${vcap.services.sso.credentials.clientSecret}
-    uaa: ${vcap.services.sso.credentials.uaaUri}
+  api: ${sso.apiEndpoint}
+  clientId: ${sso.clientId}
+  clientPassword: ${sso.clientSecret}
+  uaa: ${sso.uaaUri}
 zookeeper:
   clusterUrl: ${zk.cluster.url:}
   user: ${krb.user:}
@@ -14,16 +14,22 @@ zookeeper:
   node: ${zk.node:/auth-gateway}
 kerberos:
   user: ${krb.user:}
-  password: ${krb.password:}
+  keytab: ${krb.keytab.path:}
   kdc: ${krb.kdc:}
   realm: ${krb.realm:}
   enabled: ${krb.enabled:false}
 hdfs:
-  superUser: ${hdfs.superuser:}
-  clientKeytab: ${hdfs.keytab:}
+  superUser: ${krb.user:}
+  keytabPath: ${krb.keytab.path:}
   hiveUser: ${hdfs.hiveuser:}
+  cfUser: ${hdfs.cfuser:cf}
   arcadiaUser: ${hdfs.arcadiauser:arcadia-user}
   vcapUser: ${hdfs.vcapuser:vcap}
+  configPath: ${hdfs.config.path}
+hbase:
+  configPath: ${hbase.config.path}
+hive:
+  configPath: ${hive.config.path}
 yarn:
   cloudera:
     user: ${cloudera.user:}
@@ -35,7 +41,7 @@ group.mapping:
   url: ${hgm.url}
   kerberos:
     principal: ${hgm.principal:}
-    principalKeyTab: ${hgm.principal.keytab:}
+    keytabPath: ${hgm.principal.keytab.path:}
   https:
     username: ${hgm.username:}
     password: ${hgm.password:}
@@ -50,14 +56,14 @@ hive.server:
   connectionUrl: ${hive.connectionUrl}
   hdfsUri: ${hive.hdfsUri:hdfs://nameservice1/org/}
 warehouse.client:
-  clientKeyTab: ${warehouse.keytab:}
+  keytabPath: ${warehouse.keytab.path:}
   superUser: ${warehouse.superuser:hive}
 spring.oauth2.resource:
-    id: cloud_controller
-    jwt:
-      keyUri: ${vcap.services.sso.credentials.tokenKey}
+  id: ${resource.id:tap}
+  jwt:
+    keyUri: ${sso.tokenKey}
 logging.level:
-    org.apache.zookeeper: DEBUG
-    org.trustedanalytics: DEBUG
+  org.apache.zookeeper: INFO
+  org.trustedanalytics: INFO
 
-logging.level.org.apache.zookeeper: DEBUG
+logging.level.org.apache.zookeeper: INFO

@@ -31,43 +31,43 @@ import com.google.protobuf.ServiceException;
 
 public class HBaseClient {
 
-    private Connection connection;
+  private Connection connection;
 
-    public static HBaseClient getNewInstance(Connection connection) {
-        return new HBaseClient(connection);
-    }
+  public static HBaseClient getNewInstance(Connection connection) {
+    return new HBaseClient(connection);
+  }
 
-    public HBaseClient(Connection connection) {
-        this.connection = connection;
-    }
+  public HBaseClient(Connection connection) {
+    this.connection = connection;
+  }
 
-    public void createNamespace(String name) throws IOException {
-        NamespaceDescriptor descriptor = NamespaceDescriptor.create(name).build();
-        connection.getAdmin().createNamespace(descriptor);
-    }
+  public void createNamespace(String name) throws IOException {
+    NamespaceDescriptor descriptor = NamespaceDescriptor.create(name).build();
+    connection.getAdmin().createNamespace(descriptor);
+  }
 
-    public boolean checkNamespaceExists(String name) throws IOException{
-        for(NamespaceDescriptor namespace:connection.getAdmin().listNamespaceDescriptors())
-        {
-            if(namespace.getName().equals(name))
-                return true;
-        }
-        return false;
+  public boolean checkNamespaceExists(String name) throws IOException {
+    for (NamespaceDescriptor namespace : connection.getAdmin().listNamespaceDescriptors()) {
+      if (namespace.getName().equals(name))
+        return true;
     }
+    return false;
+  }
 
-    public void grandPremisionOnNamespace(String user, String namespace, Permission.Action permission) throws IOException, ServiceException {
-      try (Table acl = connection.getTable(AccessControlLists.ACL_TABLE_NAME)) {
-            BlockingRpcChannel service = acl.coprocessorService(HConstants.EMPTY_START_ROW);
-            AccessControlProtos.AccessControlService.BlockingInterface protocol =
-                    AccessControlProtos.AccessControlService.newBlockingStub(service);
-            ProtobufUtil.grant(protocol, user, namespace, permission);
-        }
+  public void grandPremisionOnNamespace(String user, String namespace, Permission.Action permission)
+      throws IOException, ServiceException {
+    try (Table acl = connection.getTable(AccessControlLists.ACL_TABLE_NAME)) {
+      BlockingRpcChannel service = acl.coprocessorService(HConstants.EMPTY_START_ROW);
+      AccessControlProtos.AccessControlService.BlockingInterface protocol =
+          AccessControlProtos.AccessControlService.newBlockingStub(service);
+      ProtobufUtil.grant(protocol, user, namespace, permission);
     }
+  }
 
-    public void removeNamespace(String name) throws IOException {
-        Pattern allNamespaceTables = Pattern.compile(name.concat(":.*"));
-        connection.getAdmin().disableTables(allNamespaceTables);
-        connection.getAdmin().deleteTables(allNamespaceTables);
-        connection.getAdmin().deleteNamespace(name);
-    }
+  public void removeNamespace(String name) throws IOException {
+    Pattern allNamespaceTables = Pattern.compile(name.concat(":.*"));
+    connection.getAdmin().disableTables(allNamespaceTables);
+    connection.getAdmin().deleteTables(allNamespaceTables);
+    connection.getAdmin().deleteNamespace(name);
+  }
 }

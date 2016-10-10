@@ -24,15 +24,16 @@ import com.google.common.annotations.Beta;
 @Beta
 public interface Authorizable {
 
-    void addOrganization(String orgId) throws AuthorizableGatewayException;
+  void addOrganization(String orgId) throws AuthorizableGatewayException;
 
-    void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException;
+  void addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException;
 
-    void removeOrganization(String orgId) throws AuthorizableGatewayException;
+  void removeOrganization(String orgId) throws AuthorizableGatewayException;
 
-    void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException;
+  void removeUserFromOrg(String userId, String orgId) throws AuthorizableGatewayException;
 
-    void synchronize() throws AuthorizableGatewayException;
+  void synchronize() throws AuthorizableGatewayException;
 
-    String getName();
+  String getName();
+
 }

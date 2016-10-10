@@ -30,11 +30,12 @@ import org.trustedanalytics.auth.gateway.yarn.cloudera.ConfigurationException;
 import org.trustedanalytics.auth.gateway.yarn.cloudera.YarnScheduledAllocations;
 import org.trustedanalytics.auth.gateway.yarn.cloudera.queues.Queue;
 import org.trustedanalytics.auth.gateway.yarn.cloudera.queues.SchedulablePropertiesList;
+import org.trustedanalytics.auth.gateway.yarn.utils.Qualifiers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Profile("yarn-auth-gateway")
+@Profile(Qualifiers.YARN)
 @Configuration
 public class YarnClouderaApiClient implements YarnApiClient {
 

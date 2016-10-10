@@ -13,6 +13,11 @@
  */
 package org.trustedanalytics.auth.gateway.engine.integration.tests;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.trustedanalytics.auth.gateway.cloud.Cloud;
@@ -21,11 +26,6 @@ import org.trustedanalytics.auth.gateway.cloud.api.ApiEntity;
 import org.trustedanalytics.auth.gateway.cloud.api.ApiMetadata;
 import org.trustedanalytics.auth.gateway.cloud.api.ApiResources;
 import org.trustedanalytics.auth.gateway.cloud.api.ApiResponse;
-
-import java.util.Arrays;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @Profile("test")
 public class CloudConfig {

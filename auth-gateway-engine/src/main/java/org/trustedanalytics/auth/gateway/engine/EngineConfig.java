@@ -13,6 +13,8 @@
  */
 package org.trustedanalytics.auth.gateway.engine;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,29 +23,27 @@ import org.trustedanalytics.auth.gateway.cloud.Cloud;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
 import org.trustedanalytics.auth.gateway.state.State;
 
-import java.util.List;
-
 @Configuration
 class EngineConfig {
 
-    @Value("${engine.timeout}")
-    private long timeout;
+  @Value("${engine.timeout}")
+  private long timeout;
 
-    /**
-     * IoC Container collects all Beans implementing Authorizable interface and injects here.
-     */
-    @Autowired
-    private List<Authorizable> supportedAuthorizables;
+  /**
+   * IoC Container collects all Beans implementing Authorizable interface and injects here.
+   */
+  @Autowired
+  private List<Authorizable> supportedAuthorizables;
 
-    @Autowired
-    private Cloud cloud;
+  @Autowired
+  private Cloud cloud;
 
-    @Autowired
-    private State state;
+  @Autowired
+  private State state;
 
-    @Bean
-    public Engine getEngine() {
+  @Bean
+  public Engine getEngine() {
     return new Engine(supportedAuthorizables, timeout, cloud, state);
-    }
+  }
 
 }

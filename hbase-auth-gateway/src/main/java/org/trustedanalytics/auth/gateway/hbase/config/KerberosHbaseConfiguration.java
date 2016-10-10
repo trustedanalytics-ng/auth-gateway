@@ -21,19 +21,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.trustedanalytics.auth.gateway.SystemEnvironment;
 import org.trustedanalytics.auth.gateway.hbase.kerberos.KerberosHbaseProperties;
+import org.trustedanalytics.auth.gateway.hbase.utils.Qualifiers;
 
-@Profile("hbase-auth-gateway")
 @Configuration
 public class KerberosHbaseConfiguration {
 
-    @Profile("!test")
-    @Bean
-    public KerberosHbaseProperties getKerberosHbaseProperties() throws IOException {
-        SystemEnvironment systemEnvironment = new SystemEnvironment();
-        String kdc = systemEnvironment.getVariable(SystemEnvironment.KRB_KDC);
-        String realm = systemEnvironment.getVariable(SystemEnvironment.KRB_REALM);
+  @Bean
+  @Profile(Qualifiers.TEST_EXCLUDE)
+  public KerberosHbaseProperties getKerberosHbaseProperties() throws IOException {
+    SystemEnvironment systemEnvironment = new SystemEnvironment();
+    String kdc = systemEnvironment.getVariable(SystemEnvironment.KRB_KDC);
+    String realm = systemEnvironment.getVariable(SystemEnvironment.KRB_REALM);
 
-        return new KerberosHbaseProperties(kdc, realm);
-    }
+    return new KerberosHbaseProperties(kdc, realm);
+  }
 
 }

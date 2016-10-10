@@ -22,15 +22,14 @@ import org.trustedanalytics.auth.gateway.zookeeper.ZookeeperClient;
 @Configuration
 public class StateConfig {
 
-    @Autowired
-    private ZookeeperClient client;
+  @Autowired
+  private ZookeeperClient client;
 
-    @Value("${engine.version}")
-    private String version;
+  @Value("${engine.version}")
+  private String version;
 
-    @Bean(initMethod = "init")
-    public State getState()
-    {
-        return new State(client, version);
-    }
+  @Bean(initMethod = "init")
+  public State getState() {
+    return new State(client, version);
+  }
 }

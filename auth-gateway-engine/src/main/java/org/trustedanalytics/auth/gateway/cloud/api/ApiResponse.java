@@ -13,18 +13,18 @@
  */
 package org.trustedanalytics.auth.gateway.cloud.api;
 
-import com.cloudera.com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-
 import java.util.List;
+
+import com.cloudera.com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Data;
 
 @Data
 public class ApiResponse {
-    private List<ApiResources> resources;
+  private List<ApiResources> resources;
 
-    @JsonProperty("next_url")
-    private String nextUrl;
+  @JsonProperty("next_url")
+  private String nextUrl;
 
-    public ApiResponse() {
-    }
+  public ApiResponse() {}
 }

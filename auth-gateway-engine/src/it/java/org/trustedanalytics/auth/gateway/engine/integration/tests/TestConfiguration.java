@@ -24,12 +24,12 @@ import org.trustedanalytics.auth.gateway.state.State;
 @PropertySource("classpath:application-test.yml")
 public class TestConfiguration {
 
-    @Autowired
-    private State state;
+  @Autowired
+  private State state;
 
-    @Bean
-    public Authorizable authorizable() {
-        return new FilesystemTestAuthorizable(state);
-    }
+  @Bean
+  public Authorizable authorizable() {
+    return new FilesystemTestAuthorizable(state);
+  }
 
 }

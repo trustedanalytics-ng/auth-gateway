@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.trustedanalytics</groupId>
         <artifactId>auth-gateway</artifactId>
-        <version>0.8.10</version>
+        <version>0.9.0</version>
     </parent>
     <artifactId>auth-gateway-engine</artifactId>
 
@@ -15,6 +15,8 @@
         <jacoco-measurement-instructions>0.59885</jacoco-measurement-instructions>
         <jacoco-measurement-lines>0.6000</jacoco-measurement-lines>
         <jacoco-measurement-classes>0.8500</jacoco-measurement-classes>
+        <docker.imageName>auth-gateway</docker.imageName>
+        <docker.registry>tapimages.us.enableiot.com:8080</docker.registry>
     </properties>
 
     <dependencies>
@@ -172,6 +174,24 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.4.12</version>
+                <configuration>
+                    <imageName>${docker.imageName}</imageName>
+                    <baseImage>${docker.registry}/tap-base-java:java8-jessie</baseImage>
+                    <cmd>java $JAVA_OPTS -jar /${project.build.finalName}.jar</cmd>
+                    <useConfigFile>true</useConfigFile>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
                     <execution>
@@ -205,20 +225,6 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <!-- copy jar and manifest to parent directory to meet the needs of CI tool -->
                 <executions>
-                    <execution>
-                        <id>copy-manifest</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <phase>package</phase>
-                        <configuration>
-                            <executable>cp</executable>
-                            <arguments>
-                                <argument>${project.build.outputDirectory}/manifest.yml</argument>
-                                <argument>..</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>copy-jar</id>
                         <goals>

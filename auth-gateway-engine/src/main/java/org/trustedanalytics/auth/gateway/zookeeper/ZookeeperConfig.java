@@ -21,6 +21,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.trustedanalytics.auth.gateway.SystemEnvironment;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManager;
 import org.trustedanalytics.hadoop.kerberos.KrbLoginManagerFactory;
 
@@ -53,10 +54,6 @@ public class ZookeeperConfig {
   @Getter
   private String kerberosUser;
 
-  @Value("${kerberos.keytab}")
-  @Getter
-  private String kerberosKeytab;
-
   @Value("${kerberos.kdc}")
   @Getter
   private String kdc;
@@ -66,10 +63,11 @@ public class ZookeeperConfig {
   private String realm;
 
   private void logWithCredentials() throws Exception {
+    SystemEnvironment systemEnvironment = new SystemEnvironment();
     System.setProperty("zookeeper.sasl.clientconfig", kerberosUser);
     KrbLoginManager loginManager =
         KrbLoginManagerFactory.getInstance().getKrbLoginManagerInstance(kdc, realm);
-    loginManager.loginWithKeyTab(kerberosUser, kerberosKeytab);
+    loginManager.loginWithKeyTab(kerberosUser, systemEnvironment.getVariable(SystemEnvironment.KRB_KEYTAB));
   }
 
   @Bean(initMethod = "start", destroyMethod = "close")

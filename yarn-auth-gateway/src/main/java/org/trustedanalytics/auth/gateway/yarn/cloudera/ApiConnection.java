@@ -13,16 +13,24 @@
  */
 package org.trustedanalytics.auth.gateway.yarn.cloudera;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.*;
+import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -31,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.trustedanalytics.auth.gateway.yarn.cloudera.client.api.ApiEndpoints;
 import org.trustedanalytics.auth.gateway.yarn.cloudera.client.api.entity.*;
@@ -42,7 +51,7 @@ import com.github.rholder.retry.*;
 import com.google.common.base.Predicates;
 
 @Profile(Qualifiers.YARN)
-@Configuration
+@Component
 public class ApiConnection {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ApiConnection.class);
@@ -51,18 +60,24 @@ public class ApiConnection {
 
   private static final String YARN_SERVICE_TYPE = "YARN";
 
+  private final ClouderaConfiguration configuration;
+
+  private final SSLContext sslContext;
+
   @Autowired
-  private ClouderaConfiguration configuration;
+  public ApiConnection(ClouderaConfiguration configuration) throws IOException, GeneralSecurityException {
+    this.configuration = configuration;
+    this.sslContext = getSSLContext();
+  }
 
   public YarnScheduledAllocations getConfiguration() throws ConfigurationException {
     List<ServiceConfiguration> serviceConfigurationList =
         createRestTemplate().getForObject(getClouderaUrl(ApiEndpoints.CONFIGURATION),
             ApiServiceConfiguration.class, getCluster().getName(), YARN_SERVICE_TYPE).getItems();
 
-    ServiceConfiguration serviceConfiguration =
-        serviceConfigurationList.stream()
-            .filter(conf -> conf.getName().equals(YARN_SCHEDULED_ALLOCATIONS)).findAny()
-            .orElseThrow(() -> new ConfigurationException("ServiceConfiguration malformed"));
+    ServiceConfiguration serviceConfiguration = serviceConfigurationList.stream()
+        .filter(conf -> conf.getName().equals(YARN_SCHEDULED_ALLOCATIONS)).findAny()
+        .orElseThrow(() -> new ConfigurationException("ServiceConfiguration malformed"));
     try {
       return new ObjectMapper().readValue(serviceConfiguration.getValue(),
           YarnScheduledAllocations.class);
@@ -72,17 +87,15 @@ public class ApiConnection {
   }
 
   public void updateConfiguration(String queueConfiguration) throws ConfigurationException {
-    ApiServiceConfiguration serviceConfiguration =
-        new ApiServiceConfiguration(Arrays.asList(new ServiceConfiguration(
-            YARN_SCHEDULED_ALLOCATIONS, queueConfiguration)));
+    ApiServiceConfiguration serviceConfiguration = new ApiServiceConfiguration(
+        Arrays.asList(new ServiceConfiguration(YARN_SCHEDULED_ALLOCATIONS, queueConfiguration)));
 
     RestTemplate restTemplate = createRestTemplate();
     String name = getCluster().getName();
     restTemplate.put(getClouderaUrl(ApiEndpoints.CONFIGURATION), serviceConfiguration, name,
         YARN_SERVICE_TYPE);
-    Command command =
-        restTemplate.postForObject(getClouderaUrl(ApiEndpoints.POOLS_REFRESH), null, Command.class,
-            name);
+    Command command = restTemplate.postForObject(getClouderaUrl(ApiEndpoints.POOLS_REFRESH), null,
+        Command.class, name);
     updateConfigurationWithRetries(command, restTemplate, name);
   }
 
@@ -90,37 +103,48 @@ public class ApiConnection {
     BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
     credentialsProvider.setCredentials(AuthScope.ANY,
         new UsernamePasswordCredentials(configuration.getUser(), configuration.getPassword()));
-    HttpClient httpClient =
-        HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
+
+    SSLConnectionSocketFactory factory = new SSLConnectionSocketFactory(sslContext);
+
+    HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(factory)
+        .setDefaultCredentialsProvider(credentialsProvider).build();
 
     return new RestTemplate(new HttpComponentsClientHttpRequestFactory(httpClient));
   }
 
-  private void updateConfigurationWithRetries(Command command, RestTemplate restTemplate, String cluster)
-      throws ConfigurationException {
+  private SSLContext getSSLContext() throws IOException, GeneralSecurityException {
+    KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+    try (FileInputStream fis = new FileInputStream(configuration.getStore())) {
+      ks.load(fis, configuration.getStorePassword().toCharArray());
+    }
+    return SSLContexts.custom().loadTrustMaterial(ks).build();
+  }
+
+  private void updateConfigurationWithRetries(Command command, RestTemplate restTemplate,
+      String cluster) throws ConfigurationException {
     Callable<Boolean> callable = new Callable<Boolean>() {
       @Override
       public Boolean call() throws Exception {
         LOGGER.info("Waiting for cloudera update command finish");
-        ApiCommand apiCommand =
-          restTemplate.getForObject(getClouderaUrl(ApiEndpoints.COMMANDS), ApiCommand.class,
-              cluster);
-        return apiCommand.getItems().stream().noneMatch(c -> c.getId().compareTo(command.getId()) == 0);
+        ApiCommand apiCommand = restTemplate.getForObject(getClouderaUrl(ApiEndpoints.COMMANDS),
+            ApiCommand.class, cluster);
+        return apiCommand.getItems().stream()
+            .noneMatch(c -> c.getId().equals(command.getId()));
       }
     };
 
-    Retryer<Boolean> retryer = RetryerBuilder.<Boolean>newBuilder()
-        .retryIfResult(Predicates.equalTo(false))
-        .retryIfExceptionOfType(IOException.class)
-        .retryIfException()
-        .withWaitStrategy(WaitStrategies.incrementingWait(7, TimeUnit.SECONDS, -1, TimeUnit.SECONDS))
-        .withStopStrategy(StopStrategies.stopAfterAttempt(6))
-        .build();
+    Retryer<Boolean> retryer =
+        RetryerBuilder.<Boolean>newBuilder().retryIfResult(Predicates.equalTo(false))
+            .retryIfExceptionOfType(IOException.class).retryIfException()
+            .withWaitStrategy(
+                WaitStrategies.incrementingWait(7, TimeUnit.SECONDS, -1, TimeUnit.SECONDS))
+            .withStopStrategy(StopStrategies.stopAfterAttempt(6)).build();
 
     try {
       retryer.call(callable);
     } catch (ExecutionException | RetryException e) {
-      throw new ConfigurationException("ServiceConfiguration malformed, cannot update Configuration", e);
+      throw new ConfigurationException(
+          "ServiceConfiguration malformed, cannot update Configuration", e);
     }
   }
 
@@ -130,7 +154,7 @@ public class ApiConnection {
   }
 
   private String getClouderaUrl(String path) {
-    return String.format("http://%s:%s%s", configuration.getHost(), configuration.getPort(), path);
+    return String.format("%s%s", configuration.getUrl(), path);
   }
 
 }

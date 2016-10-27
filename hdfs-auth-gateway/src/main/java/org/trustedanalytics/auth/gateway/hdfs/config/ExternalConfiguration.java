@@ -26,11 +26,7 @@ import lombok.Setter;
 @Configuration
 public class ExternalConfiguration {
 
-  @Value("${hdfs.keytabPath}")
-  @Getter @Setter
-  private String keytabPath;
-
-  @Value("${hdfs.superUser}")
+  @Value("${kerberos.user}")
   @NotNull
   @Getter @Setter
   private String superUser;

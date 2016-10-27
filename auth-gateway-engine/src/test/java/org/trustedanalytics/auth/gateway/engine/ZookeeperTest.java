@@ -145,7 +145,7 @@ public class ZookeeperTest {
     public void zookeeper_acl_addDefaultClientPrivileges() throws Exception {
         ACL newAcl = new ACL(ZooDefs.Perms.ALL, ZooDefs.Ids.ANYONE_ID_UNSAFE);
 
-        client.appentDefaultAcls(newAcl);
+        client.appendDefaultAcls(newAcl);
 
         client.createNode(znode, ZNODE_DATA.getBytes());
 
@@ -159,7 +159,7 @@ public class ZookeeperTest {
     public void zookeeper_acl_removeDefaultClientPrivileges() throws Exception {
         ACL newAcl = new ACL(ZooDefs.Perms.ALL, ZooDefs.Ids.ANYONE_ID_UNSAFE);
 
-        client.appentDefaultAcls(newAcl);
+        client.appendDefaultAcls(newAcl);
         client.removeDefaultAcls(acl);
 
         client.createNode(znode, ZNODE_DATA.getBytes());

@@ -17,54 +17,41 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.trustedanalytics.auth.gateway.cloud.Cloud;
 import org.trustedanalytics.auth.gateway.cloud.CloudApi;
-import org.trustedanalytics.auth.gateway.cloud.api.ApiEntity;
-import org.trustedanalytics.auth.gateway.cloud.api.ApiMetadata;
-import org.trustedanalytics.auth.gateway.cloud.api.ApiResources;
-import org.trustedanalytics.auth.gateway.cloud.api.ApiResponse;
+import org.trustedanalytics.auth.gateway.cloud.api.OrgApiResponse;
+import org.trustedanalytics.auth.gateway.cloud.api.UserApiResponse;
 
 @Profile("test")
 public class CloudConfig {
 
   private CloudApi cloudApi;
 
-  private ApiResources createResource(String id)
-  {
-    ApiResources resources = new ApiResources();
-    ApiEntity entity = new ApiEntity();
-    entity.setUsername(id);
-    ApiMetadata metadata = new ApiMetadata();
-    metadata.setGuid(id);
-
-    resources.setMetadata(metadata);
-    resources.setEntity(entity);
-
-    return resources;
+  private List<OrgApiResponse> createOrgResource(String... orgs) {
+    return Arrays.asList(orgs).stream().map(org -> new OrgApiResponse(org, org))
+        .collect(Collectors.toList());
   }
 
-  private ApiResponse getResponse(String id, String id2) {
-    ApiResponse response = new ApiResponse();
-    response.setNextUrl(null);
-
-    response.setResources(Arrays.asList(createResource(id), createResource(id2)));
-
-    return response;
+  private List<UserApiResponse> createUserResource(String... users) {
+    return Arrays.asList(users).stream().map(user -> new UserApiResponse(user, user, "true"))
+        .collect(Collectors.toList());
   }
 
   @Bean
   public Cloud getCloud() {
     cloudApi = mock(CloudApi.class);
 
-    when(cloudApi.getOrganizations(1)).thenReturn(getResponse(AuthGatewayControllerTest.ORG_ID,
-            AuthGatewayControllerTest.ORG1_ID));
-    when(cloudApi.getOrganizationUsers(AuthGatewayControllerTest.ORG_ID, 1))
-            .thenReturn(getResponse(AuthGatewayControllerTest.USER_ID, AuthGatewayControllerTest.USER1_ID));
-    when(cloudApi.getOrganizationUsers(AuthGatewayControllerTest.ORG1_ID, 1))
-            .thenReturn(getResponse(AuthGatewayControllerTest.USER_ID, AuthGatewayControllerTest.USER1_ID));
+    when(cloudApi.getOrganizations()).thenReturn(
+        createOrgResource(AuthGatewayControllerTest.ORG_ID, AuthGatewayControllerTest.ORG1_ID));
+    when(cloudApi.getOrganizationUsers(AuthGatewayControllerTest.ORG_ID)).thenReturn(
+        createUserResource(AuthGatewayControllerTest.USER_ID, AuthGatewayControllerTest.USER1_ID));
+    when(cloudApi.getOrganizationUsers(AuthGatewayControllerTest.ORG1_ID)).thenReturn(
+        createUserResource(AuthGatewayControllerTest.USER_ID, AuthGatewayControllerTest.USER1_ID));
 
     return new Cloud(cloudApi);
   }

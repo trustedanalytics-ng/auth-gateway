@@ -42,7 +42,7 @@ public class ZookeeperClient {
     this.basePath = validatePath(basePath);
   }
 
-  public void appentDefaultAcls(ACL acl) {
+  public void appendDefaultAcls(ACL acl) {
     acls = acls.stream().filter(acl1 -> !compareAcls(acl1, acl)).collect(toList());
     acls.add(acl);
   }
@@ -62,7 +62,7 @@ public class ZookeeperClient {
     try {
       client.create().creatingParentsIfNeeded().forPath(basePath);
     } catch (KeeperException.NodeExistsException e) {
-      LOGGER.info("Znode " + basePath + " already exists", e);
+      LOGGER.info("Znode " + basePath + " already exists");
     }
     client.setACL().withACL(acls).forPath(basePath);
   }

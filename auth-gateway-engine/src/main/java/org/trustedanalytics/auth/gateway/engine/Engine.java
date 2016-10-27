@@ -178,6 +178,11 @@ class Engine {
   }
 
   public OrganizationState addOrganization(String orgId) throws AuthorizableGatewayException {
+    OrganizationState organizationState = orgState(orgId);
+    if (organizationState.isSynchronizedState()) {
+      LOGGER.info("Organization " + orgId + " is synchronized. Validating organization settings");
+    }
+
     List<CompletableFuture<Void>> tasks = new LinkedList<>();
     for (Authorizable authorizable : supportedAuthorizables) {
       tasks.add(createFutureForMethod(() -> authorizable.addOrganization(orgId),
@@ -187,10 +192,15 @@ class Engine {
     runTasks(tasks, "Error adding organization");
     state.setValidState(orgId);
 
-    return new OrganizationState(orgId, orgId);
+    return orgState(orgId);
   }
 
   public UserState addUserToOrg(String userId, String orgId) throws AuthorizableGatewayException {
+    UserState userState = userState(orgId, userId);
+    if (userState.isSynchronizedState()) {
+      LOGGER.info("User " + orgId + "is synchronized. Validating user settings");
+    }
+
     List<CompletableFuture<Void>> tasks = new LinkedList<>();
     for (Authorizable authorizable : supportedAuthorizables) {
       tasks.add(createFutureForMethod(() -> authorizable.addUserToOrg(userId, orgId),
@@ -200,7 +210,7 @@ class Engine {
     runTasks(tasks, "Error adding user to organization");
     state.setValidState(orgId, userId);
 
-    return new UserState(userId, userId);
+    return userState(orgId, userId);
   }
 
   public void removeOrganization(String orgId) throws AuthorizableGatewayException {

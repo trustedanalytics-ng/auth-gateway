@@ -36,14 +36,18 @@ public class ClouderaConfiguration {
   @Getter
   private String password;
 
-  @Value("${yarn.cloudera.host}")
+  @Value("${yarn.cloudera.url}")
   @NotNull
   @Getter
-  private String host;
+  private String url;
 
-  @Value("${yarn.cloudera.port}")
+  @Value("${yarn.cloudera.store}")
   @NotNull
   @Getter
-  private Integer port;
+  private String store;
 
+  @Value("${yarn.cloudera.storePassword}")
+  @NotNull
+  @Getter
+  private String storePassword;
 }

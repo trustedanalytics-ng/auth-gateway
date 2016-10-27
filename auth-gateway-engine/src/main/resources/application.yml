@@ -9,7 +9,7 @@ cloud:
   uaa: ${sso.uaaUri}
 zookeeper:
   clusterUrl: ${zk.cluster.url:}
-  user: ${krb.user:}
+  user: ${zk.user:authgateway}
   password: ${zk.password:authgateway}
   node: ${zk.node:/auth-gateway}
 kerberos:
@@ -19,8 +19,6 @@ kerberos:
   realm: ${krb.realm:}
   enabled: ${krb.enabled:false}
 hdfs:
-  superUser: ${krb.user:}
-  keytabPath: ${krb.keytab.path:}
   hiveUser: ${hdfs.hiveuser:}
   cfUser: ${hdfs.cfuser:cf}
   arcadiaUser: ${hdfs.arcadiauser:arcadia-user}
@@ -34,8 +32,9 @@ yarn:
   cloudera:
     user: ${cloudera.user:}
     password: ${cloudera.password:}
-    host: ${cloudera.address:}
-    port: ${cloudera.port:}
+    url: ${cloudera.address:}
+    store: ${cloudera.truststore:}
+    storePassword: ${cloudera.truststore.password:}
 group.mapping:
   supergroup: ${hgm.supergroup:supergroup}
   url: ${hgm.url}

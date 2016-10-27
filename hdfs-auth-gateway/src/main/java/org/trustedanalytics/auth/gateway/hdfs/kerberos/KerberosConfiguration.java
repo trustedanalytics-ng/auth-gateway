@@ -35,9 +35,9 @@ public class KerberosConfiguration {
     SystemEnvironment systemEnvironment = new SystemEnvironment();
     String kdc = systemEnvironment.getVariable(SystemEnvironment.KRB_KDC);
     String realm = systemEnvironment.getVariable(SystemEnvironment.KRB_REALM);
+    String principal = systemEnvironment.getVariable(SystemEnvironment.KRB_USER);
+    String keytabFile = systemEnvironment.getVariable(SystemEnvironment.KRB_KEYTAB);
     String technicalUser = externalConfiguration.getCfUser();
-    String principal = externalConfiguration.getSuperUser();
-    String keytabFile = externalConfiguration.getKeytabPath();
     return new KerberosProperties(kdc, realm, technicalUser, principal, keytabFile);
   }
 }

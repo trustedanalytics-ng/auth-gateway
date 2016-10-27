@@ -16,8 +16,6 @@ package org.trustedanalytics.auth.gateway.cloud;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.trustedanalytics.auth.gateway.cloud.api.ApiResources;
-import org.trustedanalytics.auth.gateway.cloud.api.ApiResponse;
 import org.trustedanalytics.auth.gateway.engine.response.OrganizationState;
 import org.trustedanalytics.auth.gateway.engine.response.UserState;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
@@ -33,9 +31,9 @@ public class Cloud {
   public List<OrganizationState> getOrganizations() throws AuthorizableGatewayException {
     List<OrganizationState> organizations = new ArrayList<>();
 
-    getResourcesFromEndpoint(page -> api.getOrganizations(page)).stream().forEach(resources -> {
+    api.getOrganizations().stream().forEach(org -> {
       OrganizationState organization =
-          new OrganizationState(resources.getEntity().getName(), resources.getMetadata().getGuid());
+          new OrganizationState(org.getName(), org.getGuid());
       organization.getUsers().addAll(getUsersForOrganization(organization));
       organizations.add(organization);
     });
@@ -46,23 +44,12 @@ public class Cloud {
   public List<UserState> getUsersForOrganization(OrganizationState organization) {
     List<UserState> users = new ArrayList<>();
 
-    getResourcesFromEndpoint(page -> api.getOrganizationUsers(organization.getGuid(), page))
-        .stream().forEach(resources -> users.add(
-            new UserState(resources.getEntity().getName(), resources.getMetadata().getGuid())));
+    api.getOrganizationUsers(organization.getGuid())
+        .stream().forEach(user -> users.add(
+            new UserState(user.getUsername(), user.getGuid())));
 
     return users;
   }
 
-  private List<ApiResources> getResourcesFromEndpoint(CloudApiRequest request) {
-    return getResourcesFromEndpoint(request, 1);
-  }
 
-  private List<ApiResources> getResourcesFromEndpoint(CloudApiRequest request, int page) {
-    ApiResponse response = request.getResponse(page);
-    List<ApiResources> resources = response.getResources();
-    if (response.getNextUrl() != null)
-      resources.addAll(getResourcesFromEndpoint(request, page + 1));
-
-    return resources;
-  }
 }

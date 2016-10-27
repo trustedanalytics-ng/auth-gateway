@@ -1,7 +1,7 @@
+kerberos:
+  user: ${krb.user:super}
 hdfs:
-  keytabPath: ${hdfs.keytab.path:}
-  configPath: ${hdfs.config.path:}
-  superUser: ${hdfs.superuser:super}
+  configPath: ${hdfs.config.path:super}
   cfUser: cf
   hiveUser: hive
   arcadiaUser: test-arcadia

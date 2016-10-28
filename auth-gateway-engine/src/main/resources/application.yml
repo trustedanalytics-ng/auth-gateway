@@ -64,5 +64,7 @@ spring.oauth2.resource:
 logging.level:
   org.apache.zookeeper: INFO
   org.trustedanalytics: INFO
+endpoints:
+  health.enabled: true
 
 logging.level.org.apache.zookeeper: INFO

@@ -93,6 +93,14 @@ public class HdfsGateway implements Authorizable {
       hdfsClient.setACLForDirectoryWithSubdirectories(paths.getSqoopImportsPath(orgId),
               defaultWithDefaultKrbTechUserExec);
 
+      hdfsClient
+          .createDirectoryWithAcl(paths.getJarsPath(orgId), orgAdmin, orgId, usrAllGroupAll,
+              defaultWithTechUserAll);
+
+      hdfsClient.updateDirectoryWithSubdirectories(paths.getJarsPath(orgId), orgId, usrAllGroupRead);
+      hdfsClient.setACLForDirectoryWithSubdirectories(paths.getJarsPath(orgId),
+          defaultWithDefaultKrbTechUserExec);
+
       hdfsClient.createDirectory(paths.getOozieJobsPath(orgId), orgAdmin, orgId, usrAllGroupAll);
       hdfsClient.createDirectory(paths.getUsersPath(orgId), orgAdmin, orgId, usrAllGroupRead);
       hdfsClient.createDirectory(paths.getTmpPath(orgId), orgAdmin, orgId, usrAllGroupAll);
@@ -148,8 +156,10 @@ public class HdfsGateway implements Authorizable {
       try{
           final HdfsClient hdfsClient = HdfsClient.getNewInstance(fileSystemProvider.getFileSystem());
 
+          String techUsr = krbProperties.getTechnicalPrincipal();
+
           //create home directory for defined users
-          hdfsClient.createDirectory(paths.getUserHomePath("cf"), "cf", "cf",
+          hdfsClient.createDirectory(paths.getUserHomePath(techUsr), techUsr, techUsr,
                   HdfsPermission.USER_ALL.getPermission());
           hdfsClient.createDirectory(paths.getUserHomePath("vcap"), "vcap", "vcap",
                   HdfsPermission.USER_ALL.getPermission());
@@ -159,7 +169,7 @@ public class HdfsGateway implements Authorizable {
                   HdfsPermission.USER_ALL.getPermission());
 
           hdfsClient.createDirectory(paths.getOrgsPath(), "authgateway", "supergroup",
-                  HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission());
+                  HdfsPermission.USER_ALL_GROUP_AND_OTHERS_EXECUTE.getPermission());
 
           hdfsClient.createDirectory(new Path("/h2o"), "h2o", "h2o",
                   HdfsPermission.USER_ALL.getPermission());

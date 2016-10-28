@@ -80,6 +80,8 @@ public class HdfsGatewayIntegrationTest {
 
   private static final Path TEST_ORG_SQOOP_PATH = new Path("/org/intel/sqoop-imports");
 
+  private static final Path TEST_ORG_JARS_PATH = new Path("/org/intel/jars");
+
   private static final Path TEST_USER_PATH = new Path("/org/intel/user/test_user");
 
   @Before
@@ -105,6 +107,7 @@ public class HdfsGatewayIntegrationTest {
     checkIfDirectoryExistsWithPermissions(TEST_ORG_APP_PATH, "intel_admin", groupReadPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_BROKER_PATH, "intel_admin", groupAllPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_OOZIE_PATH, "intel_admin", groupPermission);
+//    checkIfDirectoryExistsWithPermissions(TEST_ORG_JARS_PATH, "intel_admin", groupPermission);
     checkIfDirectoryExistsWithPermissions(TEST_ORG_SQOOP_PATH, "intel_admin", groupPermission);
 
     checkIfDirectoryExistsWithPermissions(TEST_ORG_USERSPACE_PATH, "intel_admin", groupPermission);

@@ -61,9 +61,9 @@ public class HdfsGatewayTest {
 
   private static final Path SQOOP_PATH = new Path("/org/test_org/sqoop-imports");
 
-  private static final Path BROKER_PATH = new Path("/org/test_org/brokers");
+  private static final Path JARS_PATH = new Path("/org/test_org/jars");
 
-  private static final Path BROKER_METADATA_PATH = new Path("/org/test_org/brokers/metadata");
+  private static final Path BROKER_PATH = new Path("/org/test_org/brokers");
 
   private static final Path BROKER_USERSPACE_PATH = new Path("/org/test_org/brokers/userspace");
 
@@ -129,6 +129,7 @@ public class HdfsGatewayTest {
     when(pathCreator.getAppPath("test_org")).thenReturn(APP_PATH);
     when(pathCreator.getSqoopImportsPath("test_org")).thenReturn(SQOOP_PATH);
     when(pathCreator.getOozieJobsPath("test_org")).thenReturn(OOZIE_PATH);
+    when(pathCreator.getOozieJobsPath("test_org")).thenReturn(JARS_PATH);
     when(pathCreator.getUsersPath("test_org")).thenReturn(ORG_USERS_PATH);
     when(pathCreator.getUserPath("test_org", "test_user")).thenReturn(USER_PATH);
     when(pathCreator.getUserHomePath("test_user")).thenReturn(USER_HOME_PATH);

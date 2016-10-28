@@ -39,6 +39,8 @@ public class PathCreator {
 
   private static final String APP = "apps";
 
+  private static final String JARS = "jars";
+
   public Path getBrokerPath(String org) {
     return createPath(ORGS, org, BROKER);
   }
@@ -61,6 +63,10 @@ public class PathCreator {
 
   public Path getAppPath(String org) {
     return createPath(ORGS, org, APP);
+  }
+
+  public Path getJarsPath(String org) {
+    return createPath(ORGS, org, JARS);
   }
 
   public Path getOrgPath(String org) {

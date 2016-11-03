@@ -1,5 +1,5 @@
 engine:
-  timeout: 30
+  timeout: 120
   asyncTimeout: 1000
   version: ${version:UNKNOWN}
 cloud:

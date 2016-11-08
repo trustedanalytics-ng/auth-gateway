@@ -33,6 +33,8 @@ public class PathCreator {
 
   private static final String SQOOP_IMPORTS = "sqoop-imports";
 
+  private static final String DATA_SETS = "datasets";
+
   private static final String TMP = "tmp";
 
   private static final String SHARED = "shared";
@@ -67,6 +69,10 @@ public class PathCreator {
 
   public Path getJarsPath(String org) {
     return createPath(ORGS, org, JARS);
+  }
+
+  public Path getDatasetPath(String org) {
+    return createPath(ORGS, org, DATA_SETS);
   }
 
   public Path getOrgPath(String org) {

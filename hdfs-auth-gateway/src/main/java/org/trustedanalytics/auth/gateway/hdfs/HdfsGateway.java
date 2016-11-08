@@ -56,6 +56,7 @@ public class HdfsGateway implements Authorizable {
   @Autowired
   private FileSystemProvider fileSystemProvider;
 
+  //TODO Require refactoring DPNG-11791
   @Override
   public void addOrganization(String orgId) throws AuthorizableGatewayException {
     FsPermission usrAllGroupAll = HdfsPermission.USER_ALL_GROUP_ALL.getPermission();
@@ -99,6 +100,14 @@ public class HdfsGateway implements Authorizable {
 
       hdfsClient.updateDirectoryWithSubdirectories(paths.getJarsPath(orgId), orgId, usrAllGroupRead);
       hdfsClient.setACLForDirectoryWithSubdirectories(paths.getJarsPath(orgId),
+          defaultWithDefaultKrbTechUserExec);
+
+      hdfsClient
+          .createDirectoryWithAcl(paths.getDatasetPath(orgId), orgAdmin, orgId, usrAllGroupAll,
+              defaultWithTechUserAll);
+
+      hdfsClient.updateDirectoryWithSubdirectories(paths.getDatasetPath(orgId), orgId, usrAllGroupRead);
+      hdfsClient.setACLForDirectoryWithSubdirectories(paths.getDatasetPath(orgId),
           defaultWithDefaultKrbTechUserExec);
 
       hdfsClient.createDirectory(paths.getOozieJobsPath(orgId), orgAdmin, orgId, usrAllGroupAll);

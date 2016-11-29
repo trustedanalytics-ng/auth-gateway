@@ -5,7 +5,7 @@
     <parent>
         <artifactId>auth-gateway</artifactId>
         <groupId>org.trustedanalytics</groupId>
-        <version>0.9.5</version>
+        <version>0.9.6</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -45,10 +45,20 @@
             <groupId>org.springframework.security.kerberos</groupId>
             <artifactId>spring-security-kerberos-client</artifactId>
             <version>1.0.1.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-security</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-web</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.security</groupId>
+                    <artifactId>spring-security-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.trustedanalytics</groupId>

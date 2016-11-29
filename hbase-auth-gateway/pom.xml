@@ -5,7 +5,7 @@
     <parent>
         <artifactId>auth-gateway</artifactId>
         <groupId>org.trustedanalytics</groupId>
-        <version>0.9.5</version>
+        <version>0.9.6</version>
     </parent>
 
     <properties>
@@ -112,22 +112,6 @@
                 <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.trustedanalytics.servicebroker.repository</groupId>
-            <artifactId>broker-store-commons</artifactId>
-            <version>${brokerStoreVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.cloudfoundry</groupId>
-                    <artifactId>spring-boot-cf-service-broker</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.cloudfoundry</groupId>
-                    <artifactId>spring-boot-cf-service-broker-tests</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

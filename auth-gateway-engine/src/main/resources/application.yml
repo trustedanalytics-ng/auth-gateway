@@ -18,12 +18,6 @@ kerberos:
   kdc: ${krb.kdc:}
   realm: ${krb.realm:}
   enabled: ${krb.enabled:false}
-hdfs:
-  hiveUser: ${hdfs.hiveuser:}
-  cfUser: ${hdfs.cfuser:cf}
-  arcadiaUser: ${hdfs.arcadiauser:arcadia-user}
-  vcapUser: ${hdfs.vcapuser:vcap}
-  configPath: ${hdfs.config.path}
 hbase:
   configPath: ${hbase.config.path}
 hive:
@@ -66,5 +60,58 @@ logging.level:
   org.trustedanalytics: INFO
 endpoints:
   health.enabled: true
+hdfs:
+  hiveUser: ${hdfs.hiveuser:}
+  cfUser: ${hdfs.cfuser:cf}
+  arcadiaUser: ${hdfs.arcadiauser:arcadia-user}
+  vcapUser: ${hdfs.vcapuser:vcap}
+  configPath: ${hdfs.config.path}
+  structure:
+    base:
+      - path: /user/broker
+        permissions: drwx------
+        owner: broker
+        group: broker
+      - path: /user/h2o
+        permissions: drwx------
+        owner: h2o
+        group: h2o
+      - path: /org
+        permissions: drwx--x--x
+        owner: authgateway
+        group: supergroup
+    org:
+      root:
+        path: /org/{org}
+        permissions: drwxrwx---
+      user:
+        path: /org/{org}/user/{user}
+        permissions: drwx------
+      dirs:
+        - path: apps
+          permissions: drwxr-x---
+        - path: user
+          permissions: drwxr-x---
+        - path: shared
+          permissions: drwxrwx---
+        - path: tmp
+          permissions: drwxrwx---
+        - path: jars
+          permissions: drwxrwx---
+        - path: oozie-jobs
+          permissions: drwxrwx---
+        - path: brokers
+          permissions: drwxrwx---
+        - path: brokers/userspace
+          permissions: drwxrwx---
+          acl:
+            - default:user:hive:rwx
+        - path: datasets
+          permissions: drwxrwx---
+          acl:
+            - default:user:hive:rwx
+        - path: sqoop-imports
+          permissions: drwxrwx---
+          acl:
+            - default:user:hive:rwx
 
-logging.level.org.apache.zookeeper: INFO

@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -43,6 +44,9 @@ import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 @SpringApplicationConfiguration(classes = {TestIntegrationApplication.class,
         LocalConfiguration.class})
 public class HdfsGatewayIntegrationTest {
+
+  @Value("${hdfs.cfUser}")
+  private String techUser;
 
   @Autowired
   private HdfsGateway hdfsGateway;
@@ -116,14 +120,20 @@ public class HdfsGatewayIntegrationTest {
     checkIfDirectoryExistsWithPermissions(TEST_ORG_USERSPACE_PATH, "intel_admin", groupPermission);
 
     checkIfDirectoryExistsWithACL(TEST_ORG_PATH, "intel_admin",
-            new String[]{"test_cf", "test-vcap", "test-arcadia"},
-            new String[]{null, "hive", "intel_sys"});
+            new String[]{techUser},
+            new String[]{null, "hive"});
     checkIfDirectoryExistsWithACL(TEST_ORG_BROKER_PATH, "intel_admin",
-            new String[]{"test_cf", "test-vcap", "test-arcadia"},
-            new String[]{null, "hive", "intel_sys"});
+            new String[]{techUser},
+            new String[]{null, "hive"});
     checkIfDirectoryExistsWithACL(TEST_ORG_USERSPACE_PATH, "intel_admin",
-            new String[]{"test_cf", "test-vcap", "test-arcadia"},
-            new String[]{null, "hive", "intel_sys"});
+            new String[]{techUser},
+            new String[]{null, "hive"});
+    checkIfDirectoryExistsWithACL(TEST_DATASETS_PATH, "intel_admin",
+        new String[]{techUser},
+        new String[]{null, "hive"});
+    checkIfDirectoryExistsWithACL(TEST_ORG_SQOOP_PATH, "intel_admin",
+        new String[]{techUser},
+        new String[]{null, "hive"});
   }
 
   @Test

@@ -16,82 +16,27 @@ package org.trustedanalytics.auth.gateway.hdfs.utils;
 import org.apache.hadoop.fs.Path;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.trustedanalytics.auth.gateway.hdfs.config.dir.Directory;
 
 @Profile({Qualifiers.SIMPLE, Qualifiers.KERBEROS})
 @Configuration
 public class PathCreator {
 
-  private static final String ORGS = "org";
-
   private static final String USER = "user";
+  private static final String ORG_TEMPLATE = "\\{org\\}";
+  private static final String USER_TEMPLATE = "\\{user\\}";
 
-  private static final String BROKER = "brokers";
-
-  private static final String BROKER_USERSPACE = "userspace";
-
-  private static final String OOZIE_JOBS = "oozie-jobs";
-
-  private static final String SQOOP_IMPORTS = "sqoop-imports";
-
-  private static final String DATA_SETS = "datasets";
-
-  private static final String TMP = "tmp";
-
-  private static final String SHARED = "shared";
-
-  private static final String APP = "apps";
-
-  private static final String JARS = "jars";
-
-  public Path getBrokerPath(String org) {
-    return createPath(ORGS, org, BROKER);
+  public Path getOrgPath(Directory directory, String orgId) {
+    return new Path(directory.getPath().toString().replaceAll(ORG_TEMPLATE, orgId));
   }
 
-  public Path getUserspacePath(String org) {
-    return createPath(ORGS, org, BROKER, BROKER_USERSPACE);
-  }
-
-  public Path getOozieJobsPath(String org) { return createPath(ORGS, org, OOZIE_JOBS); }
-
-  public Path getSqoopImportsPath(String org) { return createPath(ORGS, org, SQOOP_IMPORTS); }
-
-  public Path getTmpPath(String org) {
-    return createPath(ORGS, org, TMP);
-  }
-
-  public Path getSharedPath(String org){
-    return createPath(ORGS, org, SHARED);
-  }
-
-  public Path getAppPath(String org) {
-    return createPath(ORGS, org, APP);
-  }
-
-  public Path getJarsPath(String org) {
-    return createPath(ORGS, org, JARS);
-  }
-
-  public Path getDatasetPath(String org) {
-    return createPath(ORGS, org, DATA_SETS);
-  }
-
-  public Path getOrgPath(String org) {
-    return createPath(ORGS, org);
-  }
-
-  public Path getUsersPath(String org) {
-    return createPath(ORGS, org, USER);
-  }
-
-  public Path getUserPath(String org, String user) {
-    return createPath(ORGS, org, USER, user);
+  public Path getOrgUserPath(Directory directory, String orgId, String userId) {
+    return new Path(directory.getPath().toString().replaceAll(ORG_TEMPLATE, orgId).replaceAll(USER_TEMPLATE, userId));
   }
 
   public Path getUserHomePath(String user) {
     return createPath(USER, user);
   }
-
-  public Path getOrgsPath() { return createPath(ORGS); }
 
   private Path createPath(String... args) {
     return getPath(Path.SEPARATOR.concat(String.join(Path.SEPARATOR, args)));

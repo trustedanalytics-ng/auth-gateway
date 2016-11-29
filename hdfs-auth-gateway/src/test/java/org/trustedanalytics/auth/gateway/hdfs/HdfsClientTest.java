@@ -69,7 +69,7 @@ public class HdfsClientTest {
       throws IOException {
     when(fileSystem.exists(TEST_PATH)).thenReturn(false);
 
-    hdfsClient.createDirectory(TEST_PATH, "test_admin", "test", userPermission);
+    hdfsClient.create(TEST_PATH, userPermission, "test_admin", "test");
 
     verify(fileSystem).exists(TEST_PATH);
     verify(fileSystem).mkdirs(TEST_PATH);
@@ -87,7 +87,7 @@ public class HdfsClientTest {
     when(status.getPermission()).thenReturn(userPermission);
     when(status.getOwner()).thenReturn("test_admin");
 
-    hdfsClient.createDirectory(TEST_PATH, "test_admin", "test", userPermission);
+    hdfsClient.create(TEST_PATH, userPermission, "test_admin", "test");
     verify(fileSystem, times(0)).mkdirs(TEST_PATH);
     verify(fileSystem).setPermission(TEST_PATH, userPermission);
     verify(fileSystem).setOwner(TEST_PATH, "test_admin", "test");
@@ -97,7 +97,7 @@ public class HdfsClientTest {
   public void deleteDirectory_fileSystemDeleteCalled_deletionSuccess() throws IOException {
     when(fileSystem.exists(TEST_PATH)).thenReturn(true);
 
-    hdfsClient.deleteDirectory(TEST_PATH);
+    hdfsClient.remove(TEST_PATH);
 
     verify(fileSystem).exists(TEST_PATH);
     verify(fileSystem).delete(TEST_PATH, true);
@@ -107,34 +107,9 @@ public class HdfsClientTest {
   public void deleteDirectory_directoryNotExists_doNothing() throws IOException {
     when(fileSystem.exists(TEST_PATH)).thenReturn(false);
 
-    hdfsClient.deleteDirectory(TEST_PATH);
+    hdfsClient.remove(TEST_PATH);
     verify(fileSystem, times(0)).mkdirs(TEST_PATH, userPermission);
     verify(fileSystem, times(0)).setOwner(TEST_PATH, "test_admin", "test");
   }
 
-  @Test
-  public void getAcl_getAclCalled_aclEntryCreated() throws IOException {
-    List<AclEntry> userAcl =
-        HdfsAclBuilder
-            .newInstanceWithDefaultEntries(FsAction.ALL)
-            .withUsersAclEntry(
-                ImmutableMap.of("test_user", FsAction.ALL, "test_user2", FsAction.READ_EXECUTE))
-            .build();
-
-    assertUserAcl(userAcl.get(0), FsAction.ALL, AclEntryType.GROUP);
-    assertUserAcl(userAcl.get(1), FsAction.ALL, AclEntryType.MASK);
-    assertUserAcl(userAcl.get(2), "test_user", FsAction.ALL, AclEntryType.USER);
-    assertUserAcl(userAcl.get(3), "test_user2", FsAction.READ_EXECUTE, AclEntryType.USER);
-  }
-
-  private void assertUserAcl(AclEntry aclEntry, String name, FsAction fsAction,
-      AclEntryType entryType) {
-    assertUserAcl(aclEntry, fsAction, entryType);
-    assertThat(aclEntry.getName(), equalTo(name));
-  }
-
-  private void assertUserAcl(AclEntry aclEntry, FsAction fsAction, AclEntryType entryType) {
-    assertThat(aclEntry.getPermission(), equalTo(fsAction));
-    assertThat(aclEntry.getType(), equalTo(entryType));
-  }
 }

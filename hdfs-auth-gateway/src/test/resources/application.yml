@@ -2,7 +2,64 @@ kerberos:
   user: ${krb.user:super}
 hdfs:
   configPath: ${hdfs.config.path:super}
-  cfUser: cf
+  cfUser: broker
   hiveUser: hive
   arcadiaUser: test-arcadia
   vcapUser: test-vcap
+  structure:
+    base:
+      - path: /user/broker
+        permissions: drwx------
+        owner: broker
+        group: broker
+      - path: /user/h2o
+        permissions: drwx------
+        owner: h2o
+        group: h2o
+      - path: /org
+        permissions: drwx--x--x
+        owner: authgateway
+        group: supergroup
+    org:
+      root:
+        path: /org/{org}
+        permissions: drwxrwx---
+        acl:
+          - user:broker:--x
+          - group:hive:r-x
+      user:
+        path: /org/{org}/user/{user}
+        permissions: drwx------
+      dirs:
+        - path: apps
+          permissions: drwxr-x---
+        - path: user
+          permissions: drwxr-x---
+        - path: shared
+          permissions: drwxrwx---
+        - path: tmp
+          permissions: drwxrwx---
+        - path: jars
+          permissions: drwxrwx---
+        - path: oozie-jobs
+          permissions: drwxrwx---
+        - path: brokers
+          permissions: drwxrwx---
+          acl:
+            - user:broker:rwx
+            - group:hive:rwx
+        - path: brokers/userspace
+          permissions: drwxrwx---
+          acl:
+            - user:broker:rwx
+            - group:hive:rwx
+        - path: datasets
+          permissions: drwxrwx---
+          acl:
+            - user:broker:rwx
+            - group:hive:rwx
+        - path: sqoop-imports
+          permissions: drwxrwx---
+          acl:
+            - user:broker:rwx
+            - group:hive:rwx

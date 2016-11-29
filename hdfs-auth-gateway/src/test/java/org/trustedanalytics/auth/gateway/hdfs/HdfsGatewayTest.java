@@ -19,6 +19,8 @@ import static org.powermock.api.mockito.PowerMockito.doThrow;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.hadoop.fs.FileStatus;
@@ -35,7 +37,10 @@ import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.trustedanalytics.auth.gateway.hdfs.config.DirectoryConfig;
 import org.trustedanalytics.auth.gateway.hdfs.config.ExternalConfiguration;
+import org.trustedanalytics.auth.gateway.hdfs.config.OrgConfig;
+import org.trustedanalytics.auth.gateway.hdfs.config.dir.OrgDirectory;
 import org.trustedanalytics.auth.gateway.hdfs.fs.FileSystemProvider;
 import org.trustedanalytics.auth.gateway.hdfs.kerberos.KerberosProperties;
 import org.trustedanalytics.auth.gateway.hdfs.utils.PathCreator;
@@ -49,31 +54,21 @@ public class HdfsGatewayTest {
 
   private static final String USER = "test_user";
 
-  private static final String SYS_GROUP = "test_org_sys";
-
   private static final Path ORG_PATH = new Path("/org/test_org");
 
   private static final Path ORG_USERS_PATH = new Path("/org/test_org/user");
 
   private static final Path TMP_PATH = new Path("/org/test_org/tmp");
 
-  private static final Path OOZIE_PATH = new Path("/org/test_org/oozie-jobs");
-
-  private static final Path SQOOP_PATH = new Path("/org/test_org/sqoop-imports");
-
-  private static final Path JARS_PATH = new Path("/org/test_org/jars");
-
-  private static final Path DATASETS_PATH = new Path("/org/test_org/dataset");
-
-  private static final Path BROKER_PATH = new Path("/org/test_org/brokers");
-
-  private static final Path BROKER_USERSPACE_PATH = new Path("/org/test_org/brokers/userspace");
-
-  private static final Path APP_PATH = new Path("/org/test_org/apps");
-
   private static final Path USER_PATH = new Path("/org/test_org/user/test_user");
 
   private static final Path USER_HOME_PATH = new Path("/user/test_user");
+
+  private static final FsPermission userPermission =
+      new FsPermission(FsAction.ALL, FsAction.NONE, FsAction.NONE);
+
+  private static final List<AclEntry> defAcl =
+      Arrays.asList(AclEntry.parseAclEntry("user:broker:--x", true));
 
   @Mock
   private FileSystem fileSystem;
@@ -96,60 +91,34 @@ public class HdfsGatewayTest {
   @Mock
   private ExternalConfiguration config;
 
+  @Mock
+  private DirectoryConfig directoryConfig;
+
   @InjectMocks
   private HdfsGateway hdfsGateway;
 
-  private FsPermission usrAllGroupAll;
-
-  private FsPermission usrAllGroupExec;
-
-  private FsPermission userAllOnly;
-
-  private FsPermission userAllGroupRead;
-
-  private List<AclEntry> defaultWithTechUserExec;
-
-  private List<AclEntry> defaultWithDefaultTechUserExec;
-
-  private List<AclEntry> defaultWithTechUserAll;
-
   @Before
   public void init() throws IOException {
-    userAllOnly = HdfsPermission.USER_ALL.getPermission();
-    usrAllGroupAll = HdfsPermission.USER_ALL_GROUP_ALL.getPermission();
-    usrAllGroupExec = HdfsPermission.USER_ALL_GROUP_EXECUTE.getPermission();
-    userAllGroupRead = HdfsPermission.USER_ALL_GROUP_READ.getPermission();
-
     when(fileSystemProvider.getFileSystem()).thenReturn(fileSystem);
     PowerMockito.spy(HdfsClient.class);
-    PowerMockito.when(HdfsClient.getNewInstance(fileSystem)).thenReturn(hdfsClient);
-
-    when(pathCreator.getOrgPath("test_org")).thenReturn(ORG_PATH);
-    when(pathCreator.getBrokerPath("test_org")).thenReturn(BROKER_PATH);
-    when(pathCreator.getUserspacePath("test_org")).thenReturn(BROKER_USERSPACE_PATH);
-    when(pathCreator.getTmpPath("test_org")).thenReturn(TMP_PATH);
-    when(pathCreator.getAppPath("test_org")).thenReturn(APP_PATH);
-    when(pathCreator.getSqoopImportsPath("test_org")).thenReturn(SQOOP_PATH);
-    when(pathCreator.getOozieJobsPath("test_org")).thenReturn(OOZIE_PATH);
-    when(pathCreator.getJarsPath("test_org")).thenReturn(JARS_PATH);
-    when(pathCreator.getDatasetPath("test_org")).thenReturn(DATASETS_PATH);
-    when(pathCreator.getUsersPath("test_org")).thenReturn(ORG_USERS_PATH);
-    when(pathCreator.getUserPath("test_org", "test_user")).thenReturn(USER_PATH);
-    when(pathCreator.getUserHomePath("test_user")).thenReturn(USER_HOME_PATH);
-    when(krbProperties.getTechnicalPrincipal()).thenReturn("test_cf");
-    when(config.getHiveUser()).thenReturn("test_hive");
-    when(config.getArcadiaUser()).thenReturn("test_arcadia");
-    when(config.getVcapUser()).thenReturn("test_vcap");
+    PowerMockito.when(HdfsClient.getInstance(fileSystem)).thenReturn(hdfsClient);
 
     when(fileSystem.getFileStatus(any())).thenReturn(status);
-    when(status.getPermission()).thenReturn(new FsPermission(FsAction.NONE, FsAction.NONE, FsAction.NONE));
+    when(status.getPermission())
+        .thenReturn(new FsPermission(FsAction.NONE, FsAction.NONE, FsAction.NONE));
 
-    defaultWithTechUserExec =
-        hdfsGateway.getDefaultAclWithKrbTechUserAction(FsAction.ALL, FsAction.EXECUTE, SYS_GROUP);
-    defaultWithDefaultTechUserExec =
-            hdfsGateway.getDefaultAclWithDefaultKrbTechUserAction(FsAction.ALL, FsAction.EXECUTE, SYS_GROUP);
-    defaultWithTechUserAll =
-        hdfsGateway.getDefaultAclWithKrbTechUserAction(FsAction.ALL, FsAction.ALL, SYS_GROUP);
+    List<OrgDirectory> others = Arrays.asList(
+        new OrgDirectory(TMP_PATH, userPermission, defAcl),
+        new OrgDirectory(ORG_USERS_PATH, userPermission, defAcl));
+    OrgDirectory root =
+        new OrgDirectory(new Path("/org/{org}"), userPermission, Collections.emptyList());
+    OrgDirectory template = new OrgDirectory(new Path("/org/{org}/user/{user}"), userPermission,
+        Collections.emptyList());
+
+    when(directoryConfig.getOrg()).thenReturn(new OrgConfig(root, template, others));
+    when(pathCreator.getOrgPath(root, "test_org")).thenReturn(ORG_PATH);
+    when(pathCreator.getOrgUserPath(template, "test_org", "test_user")).thenReturn(USER_PATH);
+    when(pathCreator.getUserHomePath("test_user")).thenReturn(USER_HOME_PATH);
   }
 
   @Test
@@ -157,23 +126,25 @@ public class HdfsGatewayTest {
       throws AuthorizableGatewayException, IOException {
 
     hdfsGateway.addOrganization(ORG);
-    verify(hdfsClient).createDirectoryWithAcl(ORG_PATH, "test_org_admin", "test_org",
-        userAllGroupRead, defaultWithTechUserExec);
-    verify(hdfsClient).createDirectoryWithAcl(BROKER_PATH, "test_org_admin", "test_org",
-            usrAllGroupAll, defaultWithDefaultTechUserExec);
-    verify(hdfsClient).createDirectoryWithAcl(BROKER_USERSPACE_PATH, "test_org_admin", "test_org",
-        userAllGroupRead, defaultWithTechUserAll);
-    verify(hdfsClient).createDirectory(ORG_USERS_PATH, "test_org_admin", "test_org",
-            userAllGroupRead);
-    verify(hdfsClient).createDirectory(TMP_PATH, "test_org_admin", "test_org", usrAllGroupAll);
-    verify(hdfsClient).createDirectory(APP_PATH, "test_org_admin", "test_org", userAllGroupRead);
+    verify(hdfsClient).create(ORG_PATH, userPermission, "test_org_admin", "test_org");
+    verify(hdfsClient).modifyAcl(ORG_PATH, Collections.emptyList());
+
+    verify(hdfsClient).create(ORG_USERS_PATH, userPermission, "test_org_admin", "test_org");
+    verify(hdfsClient).modifyAcl(ORG_USERS_PATH, defAcl);
+    verify(hdfsClient).modifyPermissionsRecursively(ORG_USERS_PATH, "test_org", userPermission);
+    verify(hdfsClient).modifyAclRecursively(ORG_USERS_PATH, defAcl);
+
+    verify(hdfsClient).create(TMP_PATH, userPermission, "test_org_admin", "test_org");
+    verify(hdfsClient).modifyAcl(TMP_PATH, defAcl);
+    verify(hdfsClient).modifyPermissionsRecursively(TMP_PATH, "test_org", userPermission);
+    verify(hdfsClient).modifyAclRecursively(TMP_PATH, defAcl);
   }
 
   @Test(expected = AuthorizableGatewayException.class)
   public void addOrganization_hdfsClientThrowIOException_throwAuthorizableGatewayException()
       throws AuthorizableGatewayException, IOException {
-    doThrow(new IOException()).when(hdfsClient).createDirectoryWithAcl(ORG_PATH, "test_org_admin",
-        "test_org", userAllGroupRead, defaultWithTechUserExec);
+    doThrow(new IOException()).when(hdfsClient).create(ORG_PATH, userPermission, "test_org_admin",
+        "test_org");
     hdfsGateway.addOrganization(ORG);
   }
 
@@ -181,13 +152,13 @@ public class HdfsGatewayTest {
   public void removeOrganization_deleteDirectoryCalled_deleteDirectoryMethodCalled()
       throws AuthorizableGatewayException, IOException {
     hdfsGateway.removeOrganization(ORG);
-    verify(hdfsClient).deleteDirectory(pathCreator.getOrgPath("test_org"));
+    verify(hdfsClient).remove(ORG_PATH);
   }
 
   @Test(expected = AuthorizableGatewayException.class)
   public void removeOrganization_hdfsClientThrowIOException_throwAuthorizableGatewayException()
       throws AuthorizableGatewayException, IOException {
-    doThrow(new IOException()).when(hdfsClient).deleteDirectory(ORG_PATH);
+    doThrow(new IOException()).when(hdfsClient).remove(ORG_PATH);
     hdfsGateway.removeOrganization(ORG);
   }
 
@@ -195,15 +166,14 @@ public class HdfsGatewayTest {
   public void addUserToOrg_createDirectoryCalled_creationSuccess()
       throws AuthorizableGatewayException, IOException {
     hdfsGateway.addUserToOrg(USER, ORG);
-    verify(hdfsClient).createDirectory(USER_PATH, "test_user", "test_org", userAllOnly);
-    verify(hdfsClient).createDirectory(USER_HOME_PATH, "test_user", "test_user", userAllOnly);
+    verify(hdfsClient).create(USER_PATH, userPermission, "test_user", "test_org");
+    verify(hdfsClient).create(USER_HOME_PATH, userPermission, "test_user", "test_org");
   }
 
   @Test(expected = AuthorizableGatewayException.class)
   public void addUserToOrg_hdfsClientThrowIOException_throwAuthorizableGatewayException()
       throws AuthorizableGatewayException, IOException {
-    doThrow(new IOException()).when(hdfsClient).createDirectory(USER_PATH, "test_user", "test_org",
-        userAllOnly);
+    doThrow(new IOException()).when(hdfsClient).create(USER_PATH, userPermission, "test_user", "test_org");
     hdfsGateway.addUserToOrg(USER, ORG);
   }
 
@@ -211,13 +181,13 @@ public class HdfsGatewayTest {
   public void removeUserFromOrg_deleteDirectoryCalled_deleteDirectoryMethodCalled()
       throws AuthorizableGatewayException, IOException {
     hdfsGateway.removeUserFromOrg(USER, ORG);
-    verify(hdfsClient).deleteDirectory(USER_PATH);
+    verify(hdfsClient).remove(USER_PATH);
   }
 
   @Test(expected = AuthorizableGatewayException.class)
   public void removeUserFromOrg_hdfsClientThrowIOException_throwAuthorizableGatewayException()
       throws AuthorizableGatewayException, IOException {
-    doThrow(new IOException()).when(hdfsClient).deleteDirectory(USER_PATH);
+    doThrow(new IOException()).when(hdfsClient).remove(USER_PATH);
     hdfsGateway.removeUserFromOrg(USER, ORG);
   }
 }

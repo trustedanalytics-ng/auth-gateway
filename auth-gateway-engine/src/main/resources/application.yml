@@ -84,6 +84,9 @@ hdfs:
       root:
         path: /org/{org}
         permissions: drwxrwx---
+        acl:
+          - user:broker:--x
+          - group:hive:r-x
       user:
         path: /org/{org}/user/{user}
         permissions: drwx------
@@ -102,16 +105,22 @@ hdfs:
           permissions: drwxrwx---
         - path: brokers
           permissions: drwxrwx---
+          acl:
+            - user:broker:rwx
+            - group:hive:rwx
         - path: brokers/userspace
           permissions: drwxrwx---
           acl:
-            - default:user:hive:rwx
+            - user:broker:rwx
+            - group:hive:rwx
         - path: datasets
           permissions: drwxrwx---
           acl:
-            - default:user:hive:rwx
+            - user:broker:rwx
+            - group:hive:rwx
         - path: sqoop-imports
           permissions: drwxrwx---
           acl:
-            - default:user:hive:rwx
+            - user:broker:rwx
+            - group:hive:rwx
 

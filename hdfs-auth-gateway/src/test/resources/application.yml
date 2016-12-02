@@ -41,6 +41,8 @@ hdfs:
           permissions: drwxrwx---
         - path: jars
           permissions: drwxrwx---
+          acl:
+            - user:broker:rwx
         - path: oozie-jobs
           permissions: drwxrwx---
         - path: brokers

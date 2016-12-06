@@ -70,15 +70,15 @@ hdfs:
     base:
       - path: /user/broker
         permissions: drwx------
-        owner: broker
+        user: broker
         group: broker
       - path: /user/h2o
         permissions: drwx------
-        owner: h2o
+        user: h2o
         group: h2o
       - path: /org
         permissions: drwx--x--x
-        owner: authgateway
+        user: authgateway
         group: supergroup
     org:
       root:

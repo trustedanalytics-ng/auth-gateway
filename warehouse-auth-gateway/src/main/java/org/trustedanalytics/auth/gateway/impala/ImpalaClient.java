@@ -69,7 +69,7 @@ public class ImpalaClient implements Closeable {
     if(isAvailable()) {
       LOGGER.info("Refresh impala cache");
       try (Statement statement = client.createStatement()) {
-        statement.execute(String.format("INVALIDATE METADATA"));
+        statement.execute("INVALIDATE METADATA");
       } catch (SQLException sqlException) {
         throw new AuthorizableGatewayException("SQL invalidate metadata query failed" ,
             sqlException);

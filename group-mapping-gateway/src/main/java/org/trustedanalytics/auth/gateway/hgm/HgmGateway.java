@@ -118,7 +118,7 @@ public class HgmGateway implements Authorizable {
 
   @Override
   public void synchronize() throws AuthorizableGatewayException {
-    LOGGER.debug(String.format("Creating base group mapping"));
+    LOGGER.debug("Creating base group mapping");
 
     createGroupWithUsers("DEPRECATED", Arrays.asList("cf", "h2o", "vcap", "hive"));
 

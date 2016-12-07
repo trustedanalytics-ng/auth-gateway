@@ -118,7 +118,7 @@ public class HdfsGateway implements Authorizable {
         fsClient.modifyAcl(dir.getPath(), dir.getAcl());
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new AuthorizableGatewayException("Can't sync hdfs", e);
     }
   }
 

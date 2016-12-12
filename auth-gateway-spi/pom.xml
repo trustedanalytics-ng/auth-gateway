@@ -5,8 +5,15 @@
     <parent>
         <groupId>org.trustedanalytics</groupId>
         <artifactId>auth-gateway</artifactId>
-        <version>0.9.11</version>
+        <version>0.9.12</version>
     </parent>
     <artifactId>auth-gateway-spi</artifactId>
     <name>auth-gateway-spi</name>
+    <dependencies>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.10</version>
+        </dependency>
+    </dependencies>
 </project>

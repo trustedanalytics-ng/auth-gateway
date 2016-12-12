@@ -22,6 +22,15 @@ import org.apache.hadoop.fs.Path;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
+import org.trustedanalytics.auth.gateway.KrbOrgWarehouseClient;
+import org.trustedanalytics.auth.gateway.OrgWarehouseClient;
+import org.trustedanalytics.auth.gateway.hive.HiveClientFactory;
+import org.trustedanalytics.auth.gateway.impala.ImpalaClientFactory;
+import org.trustedanalytics.auth.gateway.sentry.SentryClientFactory;
+import org.trustedanalytics.auth.gateway.spi.Authorizable;
+import org.trustedanalytics.auth.gateway.spi.OrgDecodingAuthorizable;
+import org.trustedanalytics.auth.gateway.spi.OrgIdDecoder;
 import org.trustedanalytics.auth.gateway.utils.Qualifiers;
 
 @org.springframework.context.annotation.Configuration
@@ -41,5 +50,16 @@ public class HadoopHiveConfiguration {
     config.addResource(new Path(configurationPath + "yarn-site.xml"));
     return config;
   }
-}
 
+  @Profile(Qualifiers.SIMPLE)
+  @Bean
+  public Authorizable simpleWarehouseClient(HiveClientFactory hiveFactory, ImpalaClientFactory impalaFactory) {
+    return new OrgDecodingAuthorizable(new OrgWarehouseClient(hiveFactory, impalaFactory), new OrgIdDecoder()::decode);
+  }
+
+  @Profile(Qualifiers.KERBEROS)
+  @Bean
+  public Authorizable krbWarehouseClient(SentryClientFactory sentryFactory, HiveClientFactory hiveFactory, ImpalaClientFactory impalaFactory) {
+    return new OrgDecodingAuthorizable(new KrbOrgWarehouseClient(sentryFactory, hiveFactory, impalaFactory), new OrgIdDecoder()::decode);
+  }
+}

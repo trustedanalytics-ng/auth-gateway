@@ -13,29 +13,20 @@
  */
 package org.trustedanalytics.auth.gateway.hgm;
 
-import java.util.Arrays;
-import java.util.List;
+import com.google.common.collect.ImmutableMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.trustedanalytics.auth.gateway.hgm.entity.User;
 import org.trustedanalytics.auth.gateway.hgm.utils.ApiEndpoints;
-import org.trustedanalytics.auth.gateway.hgm.utils.Qualifiers;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
+import java.util.Arrays;
+import java.util.List;
 
-@Configuration
-@Profile({Qualifiers.SIMPLE, Qualifiers.KERBEROS})
 public class HgmGateway implements Authorizable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HgmGateway.class);
@@ -47,15 +38,17 @@ public class HgmGateway implements Authorizable {
   private static final String NAME = "hgm";
   private static final String AUTHGATEWAY = "authgateway";
 
-  @Value("${group.mapping.url}")
   private String groupMappingServiceUrl;
 
-  @Value("${group.mapping.supergroup}")
   private String supergroupName;
 
-  @Autowired
-  @Qualifier("hgmRestTemplate")
   private RestTemplate restTemplate;
+
+  public HgmGateway(String groupMappingServiceUrl, String supergroupName, RestTemplate restTemplate) {
+    this.groupMappingServiceUrl = groupMappingServiceUrl;
+    this.supergroupName = supergroupName;
+    this.restTemplate = restTemplate;
+  }
 
   @Override
   public void addOrganization(String orgId) throws AuthorizableGatewayException {
@@ -152,10 +145,4 @@ public class HgmGateway implements Authorizable {
   private List<String> getGroups() throws AuthorizableGatewayException {
     return Arrays.asList(restTemplate.getForObject(createUrl(ApiEndpoints.GROUPS), String[].class));
   }
-
-  @VisibleForTesting
-  void setGroupMappingServiceUrl(String url) {
-    groupMappingServiceUrl = url;
-  }
-
 }

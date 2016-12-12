@@ -13,27 +13,24 @@
  */
 package org.trustedanalytics.auth.gateway;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 import org.trustedanalytics.auth.gateway.hive.HiveClientFactory;
 import org.trustedanalytics.auth.gateway.impala.ImpalaClientFactory;
 import org.trustedanalytics.auth.gateway.spi.Authorizable;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
-import org.trustedanalytics.auth.gateway.utils.Qualifiers;
 
 
-@Component
-@Profile(Qualifiers.SIMPLE)
 public class OrgWarehouseClient implements Authorizable {
 
   public static final String WAREHOUSE = "warehouse";
 
-  @Autowired
-  private HiveClientFactory hiveFactory;
+  private final HiveClientFactory hiveFactory;
 
-  @Autowired
-  private ImpalaClientFactory impalaFactory;
+  private final ImpalaClientFactory impalaFactory;
+
+  public OrgWarehouseClient(HiveClientFactory hiveFactory, ImpalaClientFactory impalaFactory) {
+    this.hiveFactory = hiveFactory;
+    this.impalaFactory = impalaFactory;
+  }
 
   @Override
   public void addOrganization(String orgId) throws AuthorizableGatewayException {

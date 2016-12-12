@@ -23,23 +23,25 @@ import org.trustedanalytics.auth.gateway.spi.Authorizable;
 import org.trustedanalytics.auth.gateway.spi.AuthorizableGatewayException;
 import org.trustedanalytics.auth.gateway.utils.Qualifiers;
 
-@Component
-@Profile(Qualifiers.KERBEROS)
 public class KrbOrgWarehouseClient implements Authorizable {
 
   public static final String WAREHOUSE = "krb-warehouse";
 
-  @Autowired
   private SentryClientFactory sentryFactory;
 
-  @Autowired
   private HiveClientFactory hiveFactory;
 
-  @Autowired
   private ImpalaClientFactory impalaFactory;
+
+  public KrbOrgWarehouseClient(SentryClientFactory sentryFactory, HiveClientFactory hiveFactory, ImpalaClientFactory impalaFactory) {
+    this.sentryFactory = sentryFactory;
+    this.hiveFactory = hiveFactory;
+    this.impalaFactory = impalaFactory;
+  }
 
   @Override
   public void addOrganization(String orgId) throws AuthorizableGatewayException {
+
     sentryFactory.createRequest(sentryClient -> {
       sentryClient.createRole(orgId);
       sentryClient.grantRoleToGroup(orgId, orgId);

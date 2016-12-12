@@ -36,7 +36,6 @@ public class HgmGatewayTest {
   @Mock
   private RestTemplate restTemplate;
 
-  @InjectMocks
   private HgmGateway hgmGateway;
 
   private static final String ORG_ID = "test_org_id";
@@ -49,7 +48,7 @@ public class HgmGatewayTest {
 
   @Before
   public void initialize() {
-    hgmGateway.setGroupMappingServiceUrl(HGM_TEST_URL);
+    hgmGateway = new HgmGateway(HGM_TEST_URL, null, restTemplate);
   }
 
   @Test

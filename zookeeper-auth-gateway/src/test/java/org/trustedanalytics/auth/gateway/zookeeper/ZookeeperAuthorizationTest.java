@@ -34,6 +34,7 @@ public class ZookeeperAuthorizationTest {
 
   private static final String ADMIN_USER = "adminUsername";
   private static final String USER = "user";
+  private static final String TECH_USER = "broker";
   private static final String ORG_ID = "aa549477-2899-4889-b8a2-04930909ad67";
   private static final String ORG_NAME = "org";
 
@@ -44,7 +45,7 @@ public class ZookeeperAuthorizationTest {
 
   @Before
   public void setUp() throws Exception {
-    zookeeperGateway = new ZookeeperGateway(zkClient, ADMIN_USER);
+    zookeeperGateway = new ZookeeperGateway(zkClient, ADMIN_USER, TECH_USER);
   }
 
   @Test

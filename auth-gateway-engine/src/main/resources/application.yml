@@ -8,6 +8,7 @@ cloud:
   clientPassword: ${sso.clientSecret}
   uaa: ${sso.uaaUri}
 zookeeper:
+  brokerUser: ${zk.broker.user:broker}
   clusterUrl: ${zk.cluster.url:}
   user: ${zk.user:authgateway}
   password: ${zk.password:authgateway}

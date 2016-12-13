@@ -41,15 +41,18 @@ public class ZookeeperGatewayConfig {
   @Value("${zookeeper.user}")
   private String username;
 
+  @Value("${zookeeper.brokerUser")
+  private String brokerUser;
+
   @Bean
   @Profile(Qualifiers.SIMPLE)
   public Authorizable createInSecureZookeeperGateway() throws IOException, LoginException {
-    return new ZookeeperGateway(new KerberoslessZookeeperClient(curatorFramework, BASE_NODE), username);
+    return new ZookeeperGateway(new KerberoslessZookeeperClient(curatorFramework, BASE_NODE), username, brokerUser);
   }
 
   @Bean
   @Profile(Qualifiers.KERBEROS)
   public Authorizable createSecureZookeeperGateway() throws IOException, LoginException {
-    return new ZookeeperGateway(new KerberosfulZookeeperClient(curatorFramework, BASE_NODE), username);
+    return new ZookeeperGateway(new KerberosfulZookeeperClient(curatorFramework, BASE_NODE), username, brokerUser);
   }
 }

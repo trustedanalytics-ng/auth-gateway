@@ -15,7 +15,6 @@
 package org.trustedanalytics.auth.gateway.zookeeper.integration;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
@@ -35,7 +34,9 @@ import org.trustedanalytics.auth.gateway.zookeeper.integration.zkoperations.Zook
 @RunWith(MockitoJUnitRunner.class)
 public abstract class IntegrationTestBase {
 
-    private static final String USERNAME = "username";
+  private static final String USERNAME = "username";
+  private static final String TECH_USER = "broker";
+  private static final String AUTH_SCHEME = "sasl";
 
   private String rootNode;
   private ZookeeperTestOperations zkTestOperations;
@@ -51,7 +52,7 @@ public abstract class IntegrationTestBase {
     zkTestOperations = getZkTestOperations();
     zkTestOperations.createNode(rootNode);
 
-    sut = new ZookeeperGateway(getZookeeperClient(rootNode), USERNAME);
+    sut = new ZookeeperGateway(getZookeeperClient(rootNode), USERNAME, TECH_USER);
   }
 
   protected abstract ZookeeperTestOperations getZkTestOperations();
@@ -76,7 +77,8 @@ public abstract class IntegrationTestBase {
 
     // assert
     zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-        withAcl(ZookeeperPermission.CRDWA, USERNAME));
+            Arrays.asList(new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, USERNAME)),
+                          new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, TECH_USER))));
   }
 
   @Test
@@ -93,7 +95,8 @@ public abstract class IntegrationTestBase {
 
     // assert
     zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-        withAcl(ZookeeperPermission.CRDWA, USERNAME));
+            Arrays.asList(new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, USERNAME)),
+                          new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, TECH_USER))));
   }
 
   @Test
@@ -109,8 +112,11 @@ public abstract class IntegrationTestBase {
     sut.addUserToOrg(userId, orgId);
 
     // assert
-    zkTestOperations.assertNodeExists(rootNode + "/" + orgId, withAcls(ZookeeperPermission.CRDWA,
-            USERNAME, ZookeeperPermission.CRDW, userId));
+    zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
+            Arrays.asList(new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, USERNAME)),
+                          new ACL(ZookeeperPermission.CRDW.getPerms(), new Id(AUTH_SCHEME, userId)),
+                          new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, TECH_USER))));
+
   }
 
   @Test
@@ -128,8 +134,10 @@ public abstract class IntegrationTestBase {
     sut.addUserToOrg(userId, orgId);
 
     // assert
-    zkTestOperations.assertNodeExists(rootNode + "/" + orgId, withAcls(ZookeeperPermission.CRDWA,
-            USERNAME, ZookeeperPermission.CRDW, userId));
+    zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
+            Arrays.asList(new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, USERNAME)),
+                          new ACL(ZookeeperPermission.CRDW.getPerms(), new Id(AUTH_SCHEME, userId)),
+                          new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, TECH_USER))));
   }
 
   @Test
@@ -148,8 +156,10 @@ public abstract class IntegrationTestBase {
 
     // assert
     zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
-        withAcls(ZookeeperPermission.CRDWA, USERNAME, ZookeeperPermission.CRDW,
-            userId1, ZookeeperPermission.CRDW, userId2));
+            Arrays.asList(new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, USERNAME)),
+                          new ACL(ZookeeperPermission.CRDW.getPerms(), new Id(AUTH_SCHEME, userId1)),
+                          new ACL(ZookeeperPermission.CRDW.getPerms(), new Id(AUTH_SCHEME, userId2)),
+                          new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, TECH_USER))));
   }
 
   @Test
@@ -168,8 +178,10 @@ public abstract class IntegrationTestBase {
     sut.removeUserFromOrg(userId1, orgId);
 
     // assert
-    zkTestOperations.assertNodeExists(rootNode + "/" + orgId, withAcls(ZookeeperPermission.CRDWA,
-            USERNAME, ZookeeperPermission.CRDW, userId2));
+    zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
+            Arrays.asList(new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, USERNAME)),
+                          new ACL(ZookeeperPermission.CRDW.getPerms(), new Id(AUTH_SCHEME, userId2)),
+                          new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, TECH_USER))));
   }
 
   @Test
@@ -190,8 +202,10 @@ public abstract class IntegrationTestBase {
     sut.removeUserFromOrg(userId1, orgId);
 
     // assert
-    zkTestOperations.assertNodeExists(rootNode + "/" + orgId, withAcls(ZookeeperPermission.CRDWA,
-            USERNAME, ZookeeperPermission.CRDW, userId2));
+    zkTestOperations.assertNodeExists(rootNode + "/" + orgId,
+            Arrays.asList(new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, USERNAME)),
+                          new ACL(ZookeeperPermission.CRDW.getPerms(), new Id(AUTH_SCHEME, userId2)),
+                          new ACL(ZookeeperPermission.CRDWA.getPerms(), new Id(AUTH_SCHEME, TECH_USER))));
   }
 
   @Test
@@ -225,23 +239,4 @@ public abstract class IntegrationTestBase {
     zkTestOperations.assertNodeNotExist(rootNode + "/" + orgId);
   }
 
-  private List<ACL> withAcl(ZookeeperPermission permissions, String user) {
-    return Arrays.asList(new ACL(permissions.getPerms(), new Id("sasl", user)));
-  }
-
-  private List<ACL> withAcls(ZookeeperPermission permissionsUser1, String user1,
-      ZookeeperPermission permissionsUser2, String user2) {
-
-    return Arrays.asList(new ACL(permissionsUser1.getPerms(), new Id("sasl", user1)),
-        new ACL(permissionsUser2.getPerms(), new Id("sasl", user2)));
-  }
-
-  private List<ACL> withAcls(ZookeeperPermission permissionsUser1, String user1,
-      ZookeeperPermission permissionsUser2, String user2, ZookeeperPermission permissionsUser3,
-      String user3) {
-
-    return Arrays.asList(new ACL(permissionsUser1.getPerms(), new Id("sasl", user1)),
-        new ACL(permissionsUser2.getPerms(), new Id("sasl", user2)),
-        new ACL(permissionsUser3.getPerms(), new Id("sasl", user3)));
-  }
 }

@@ -14,7 +14,7 @@
 
 package org.trustedanalytics.auth.gateway.zookeeper.integration.zkoperations;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.*;
 
 import java.io.Closeable;
@@ -66,7 +66,7 @@ public class ZookeeperTestOperations implements Closeable {
   public void assertNodeExists(String nodePath, List<ACL> acls) throws Exception {
     if (saslChecking) {
       List<ACL> actualAcls = curator.getACL().forPath(nodePath);
-      assertThat(actualAcls, equalTo(acls));
+      assertThat(actualAcls, containsInAnyOrder(acls.toArray()));
     } else {
       Stat stat = curator.checkExists().forPath(nodePath);
       assertNotNull(stat);

@@ -23,16 +23,19 @@ public class ZookeeperGateway implements Authorizable {
 
   private final ZookeeperClient zkClient;
   private final String superUser;
+  private final String techUser;
 
-  public ZookeeperGateway(ZookeeperClient zkClient, String superUser) {
+  public ZookeeperGateway(ZookeeperClient zkClient, String superUser, String techUser) {
     this.zkClient = zkClient;
     this.superUser = superUser;
+    this.techUser = techUser;
   }
 
   @Override
   public void addOrganization(String orgId) throws AuthorizableGatewayException {
     try {
       zkClient.createZnode(orgId, superUser, ZookeeperPermission.CRDWA);
+      zkClient.addUserToAcl(orgId, techUser, ZookeeperPermission.CRDWA);
     } catch (Exception e) {
       throw new AuthorizableGatewayException(failMsg("creating znode"), e);
     }

@@ -17,8 +17,6 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.trustedanalytics.auth.gateway.hdfs.utils.Qualifiers;
 
 import lombok.Getter;
 import lombok.Setter;

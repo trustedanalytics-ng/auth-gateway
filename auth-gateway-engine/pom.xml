@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.trustedanalytics</groupId>
         <artifactId>auth-gateway</artifactId>
-        <version>0.9.13</version>
+        <version>0.9.14</version>
     </parent>
     <artifactId>auth-gateway-engine</artifactId>
 
@@ -16,7 +16,6 @@
         <jacoco-measurement-lines>0.6000</jacoco-measurement-lines>
         <jacoco-measurement-classes>0.8500</jacoco-measurement-classes>
         <docker.imageName>auth-gateway</docker.imageName>
-        <docker.registry>tapimages.us.enableiot.com:8080</docker.registry>
     </properties>
 
     <dependencies>
@@ -206,7 +205,7 @@
                 <version>0.4.12</version>
                 <configuration>
                     <imageName>${docker.imageName}</imageName>
-                    <baseImage>${docker.registry}/tap-base-java:java8-jessie</baseImage>
+                    <baseImage>tapimages:8080/tap-base-java:java8-jessie</baseImage>
                     <cmd>java $JAVA_OPTS -jar /${project.build.finalName}.jar</cmd>
                     <useConfigFile>true</useConfigFile>
                     <resources>

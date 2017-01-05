@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.trustedanalytics</groupId>
         <artifactId>auth-gateway</artifactId>
-        <version>0.9.15</version>
+        <version>0.9.16</version>
     </parent>
     <artifactId>auth-gateway-engine</artifactId>
 
@@ -16,6 +16,7 @@
         <jacoco-measurement-lines>0.6000</jacoco-measurement-lines>
         <jacoco-measurement-classes>0.8500</jacoco-measurement-classes>
         <docker.imageName>auth-gateway</docker.imageName>
+        <build.time>${maven.build.timestamp}</build.time>
     </properties>
 
     <dependencies>
@@ -191,10 +192,34 @@
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>false</filtering>
+                <filtering>true</filtering>
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>2.2.1</version>
+                <configuration>
+                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                    <includeOnlyProperties>
+                        <includeOnlyProperty>^git.tags</includeOnlyProperty>
+                        <includeOnlyProperty>^git.branch</includeOnlyProperty>
+                        <includeOnlyProperty>^git.commit.*</includeOnlyProperty>
+                    </includeOnlyProperties>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <delimiters>
+                        <delimiter>@</delimiter>
+                    </delimiters>
+                    <useDefaultDelimiters>false</useDefaultDelimiters>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

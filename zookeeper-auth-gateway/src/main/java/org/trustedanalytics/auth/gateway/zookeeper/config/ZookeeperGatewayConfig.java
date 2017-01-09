@@ -41,7 +41,7 @@ public class ZookeeperGatewayConfig {
   @Value("${zookeeper.user}")
   private String username;
 
-  @Value("${zookeeper.brokerUser")
+  @Value("${zookeeper.brokerUser}")
   private String brokerUser;
 
   @Bean

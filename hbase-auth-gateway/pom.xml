@@ -5,7 +5,7 @@
     <parent>
         <artifactId>auth-gateway</artifactId>
         <groupId>org.trustedanalytics</groupId>
-        <version>0.9.18</version>
+        <version>0.9.19</version>
     </parent>
 
     <properties>

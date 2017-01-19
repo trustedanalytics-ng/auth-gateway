@@ -106,27 +106,32 @@ hdfs:
         - path: jars
           permissions: drwxrwx---
           acl:
+            - user:tap:rwx
             - user:broker:rwx
         - path: oozie-jobs
           permissions: drwxrwx---
         - path: brokers
           permissions: drwxrwx---
           acl:
+            - user:tap:rwx
             - user:broker:rwx
             - group:hive:rwx
         - path: brokers/userspace
           permissions: drwxrwx---
           acl:
+            - user:tap:rwx
             - user:broker:rwx
             - group:hive:rwx
         - path: datasets
           permissions: drwxrwx---
           acl:
+            - user:tap:rwx
             - user:broker:rwx
             - group:hive:rwx
         - path: sqoop-imports
           permissions: drwxrwx---
           acl:
+            - user:tap:rwx
             - user:broker:rwx
             - group:hive:rwx
 
